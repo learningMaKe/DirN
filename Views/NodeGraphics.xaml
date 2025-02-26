@@ -1,0 +1,39 @@
+﻿<UserControl
+  x:Class="DirN.Views.NodeGraphics"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+  xmlns:local="clr-namespace:DirN.Views"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:prism="http://prismlibrary.com/"
+  xmlns:proxy="clr-namespace:DirN.Utils.BindingProxy"
+  xmlns:system="clr-namespace:System;assembly=mscorlib"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  xmlns:viewmodels="clr-namespace:DirN.ViewModels"
+  d:DataContext="{d:DesignInstance Type=viewmodels:NodeGraphicsViewModel}"
+  d:DesignHeight="450"
+  d:DesignWidth="800"
+  prism:ViewModelLocator.AutoWireViewModel="True"
+  mc:Ignorable="d">
+  <i:Interaction.Triggers>
+    <i:EventTrigger EventName="Loaded">
+      <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+    </i:EventTrigger>
+  </i:Interaction.Triggers>
+  <Grid
+    x:Name="GraphicsGrid"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    Background="Transparent">
+
+
+    <local:NodeCanvas />
+
+    <local:ViewStored />
+
+
+
+  </Grid>
+
+</UserControl>

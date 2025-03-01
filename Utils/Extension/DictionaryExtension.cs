@@ -13,5 +13,16 @@ namespace DirN.Utils.Extension
             dictionary.TryAdd(key, value);
             return dictionary;
         }
+
+        public static Dictionary<TKey, TValue> Set<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, KeyValuePair<TKey, TValue> keyValuePair) where TKey : notnull
+        {
+            dictionary.TryAdd(keyValuePair.Key, keyValuePair.Value);
+            return dictionary;
+        }
+
+        public static IList<(TKey, TValue)> AsTupleList<TKey, TValue>(this Dictionary<TKey, TValue> dictionary) where TKey : notnull
+        {
+            return dictionary.Select(x => (x.Key, x.Value)).ToList();
+        }
     }
 }

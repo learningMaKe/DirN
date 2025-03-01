@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DirN.ViewModels.PointerControl
 {
-    public class PIntViewModel:PViewModel<PInt,PIntViewModel>
+    public class PIntViewModel:PViewModel
     {
         public override string GetData()
         {

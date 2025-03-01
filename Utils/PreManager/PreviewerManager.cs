@@ -23,9 +23,7 @@ namespace DirN.Utils.PreManager
             eventAggregator = containerProvider.Resolve<IEventAggregator>();
             keyManager = containerProvider.Resolve<KeyManager>();
 
-            keyManager.RegisterKeyBinding(KeyState.Down, Key.Tab, OnKeyDown);
-            keyManager.RegisterKeyBinding(KeyState.Up, Key.Tab, OnKeyUp);
-
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.V_Previewer, OnKeyEnter);
         }
 
         private void OnPreviewerVisibilityChanged()
@@ -41,16 +39,10 @@ namespace DirN.Utils.PreManager
             eventAggregator.GetEvent<PreviewerEvent.PreviewerVisibilityChangedEvent>().Publish(PreviewerVisibility);
         }
 
-        private void OnKeyDown(KeyEventArgs e)
+        private void OnKeyEnter(KeyEventArgs e)
         {
             e.Handled = true;
-            PreviewerVisibility = true;
-        }
-
-        private void OnKeyUp(KeyEventArgs e)
-        {
-            e.Handled = true;
-            PreviewerVisibility = false;
+            PreviewerVisibility = !PreviewerVisibility;
         }
 
     }

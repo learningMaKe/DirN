@@ -9,8 +9,26 @@ using Wpf.Ui.Extensions;
 
 namespace DirN.Utils
 {
-    public class ManagerBase<T>(IContainerProvider containerProvider) : BindableBase where T :ManagerBase<T>
+    public class ManagerBase(IContainerProvider containerProvider) : BindableBase
     {
+        protected IEventAggregator eventAggregator = containerProvider.Resolve<IEventAggregator>();
+
+        protected IContentDialogService contentDialogService = containerProvider.Resolve<IContentDialogService>();
+
+        public void ShowText(string content)
+        {
+            contentDialogService.ShowSimpleDialogAsync(new()
+            {
+                Title = "展示信息",
+                CloseButtonText = "确认",
+                Content = content,
+            });
+        }
+    }
+
+    public class ManagerBase<T> : ManagerBase where T :ManagerBase<T>
+    {
+
         private static T? instance;
 
         public static T Instance
@@ -19,28 +37,46 @@ namespace DirN.Utils
             {
                 if (instance == null)
                 {
-                    throw new InvalidOperationException("NodeGraphicsManager is not initialized.");
+                    throw new InvalidOperationException($"{typeof(T).Name} is not initialized.");
                 }
                 return instance;
             }
-            protected set
+            private set
             {
                 instance = value;
             }
         }
 
-        protected IEventAggregator eventAggregator = containerProvider.Resolve<IEventAggregator>();
-
-        protected IContentDialogService contentDialogService = containerProvider.Resolve<IContentDialogService>();
-
-        public void ShowText(string content)
+        public ManagerBase(IContainerProvider containerProvider):base(containerProvider)
         {
-            contentDialogService.ShowSimpleDialogAsync(new() 
-            { 
-                Title="展示信息",
-                CloseButtonText="确认",
-                Content=content,
-            });
+            Instance = (T)this;
+        }
+
+    }
+
+    public class ManagerBase<TManager, TIManager> : ManagerBase where TManager : ManagerBase<TManager, TIManager>,TIManager
+    {
+        private static TIManager? instance;
+
+        public static TIManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    throw new InvalidOperationException($"{typeof(TIManager).Name} is not initialized.");
+                }
+                return instance;
+            }
+            private set
+            {
+                instance = value;
+            }
+        }
+
+        public ManagerBase(IContainerProvider containerProvider) : base(containerProvider)
+        {
+            Instance = (TManager)this;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using DirN.Utils.DirManager;
-using DirN.Utils.NgManager;
+﻿using DirN.Utils.NgManager;
+using DirN.Utils.Nodes.Attributes;
 using DirN.ViewModels.Node;
 using System;
 using System.Collections.Generic;
@@ -9,21 +9,23 @@ using System.Threading.Tasks;
 
 namespace DirN.Utils.Nodes.Achieved
 {
-    public class InputHandler : TypedHandler
+    [HDes("输出")]
+    public class HOutput : TypedHandler
     {
-        protected override Type[] InputTypes => [];
+        public override Type[] InputTypes => [typeof(object)];
 
-        protected override Type[] OutputTypes => [typeof(string)];
+        public override Type[] OutputTypes => [];
 
         public override void Init(INode parent)
         {
             base.Init(parent);
-            Header = "输入";
+            Header = "输出";
         }
 
         protected override IList<object?> Handle(IList<object?> input)
         {
-            return [DirectoryManager.Instance.Directory];
+            NodeGraphicsManager.Instance.ShowText("输出：" + input[0]);
+            return [];
         }
     }
 }

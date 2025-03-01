@@ -1,4 +1,5 @@
-﻿using DirN.Utils.Nodes.Bulider;
+﻿using DirN.Utils.Nodes.Attributes;
+using DirN.Utils.Nodes.Bulider;
 using DirN.Utils.Nodes.Exceptions;
 using DirN.ViewModels.Node;
 using PropertyChanged;
@@ -17,8 +18,8 @@ namespace DirN.Utils.Nodes
     {
         public INode? Parent { get; init; }
 
-        protected abstract Type[] InputTypes { get; }
-        protected abstract Type[] OutputTypes { get; }
+        public abstract Type[] InputTypes { get; }
+        public abstract Type[] OutputTypes { get; }
 
         public ObservableCollection<IPointer> InputGroup { get; set; } = [];
         public ObservableCollection<IPointer> OutputGroup { get; set; } = [];
@@ -32,22 +33,15 @@ namespace DirN.Utils.Nodes
 
         public Color HeaderEffectColor { get;private set; } = Colors.Black;
 
-        public virtual void Init(INode parent) { }
-
-        public static INodeHandler Create<THandler>(INode parent) where THandler : TypedHandler, new()
+        public virtual void Init(INode parent) 
         {
-            if(parent is null)
+            Type type = GetType();
+            HDesAttribute? hdes=type.GetCustomAttributes(typeof(HDesAttribute), true).FirstOrDefault() as HDesAttribute;
+            if (hdes is not null)
             {
-                throw new NullReferenceException("Parent cannot be null");
+                Header = hdes.Header;
+                MainColor = hdes.MainColor;
             }
-            THandler handler = new()
-            {
-                Parent = parent
-            };
-            handler.InputGroup = HandlerBulider.Pointer<InputerViewModel>(parent, handler.InputTypes);
-            handler.OutputGroup = HandlerBulider.Pointer<OutputerViewModel>(parent, handler.OutputTypes);
-            handler.Init(parent);
-            return handler;
         }
 
         public void DataFlow()

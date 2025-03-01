@@ -1,8 +1,10 @@
 ﻿using DirN.Utils.Events.EventType;
+using DirN.Utils.Nodes;
 using DirN.ViewModels.Node;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -14,6 +16,8 @@ namespace DirN.Utils.NgManager.Curves
 {
     public abstract class CurveBase : BindableBase, ICurve
     {
+        private object? data;
+
         [OnChangedMethod(nameof(Recalculate))]
         public Point StartPoint { get; set; }
 
@@ -25,6 +29,7 @@ namespace DirN.Utils.NgManager.Curves
         public Point ControlPoint2 { get;protected set; }
 
         public double Thickness { get; set; } = 2;
+
         public Brush Brush { get; set; } = Brushes.Red;
 
         [OnChangedMethod(nameof(OnStartPointOwnerSet))]
@@ -35,7 +40,23 @@ namespace DirN.Utils.NgManager.Curves
 
         public bool CanExist => StartPointOwner is not null || EndPointOwner is not null;
 
-        public object? Data { get; set; }
+        public object? Data
+        {
+            get
+            {
+                if(HandlerManager.ConvertData(StartPointOwner!.PointerParent.PointerType, EndPointOwner!.PointerParent.PointerType, data,out object? result))
+                {
+                    return result;
+                }
+                Debug.WriteLine($"数据转换失败 StartPointOwner:{StartPointOwner.PointerParent.PointerType} EndPointOwner:{EndPointOwner.PointerParent.PointerType}");
+                return null ;
+            }
+            set
+            {
+                data = value;
+                SetProperty(ref data, value);
+            }
+        }
 
         public void Remove()
         {
@@ -76,9 +97,9 @@ namespace DirN.Utils.NgManager.Curves
             }
         }
 
-        private static Point RelativeTo(UIElement owner)
+        private static Point RelativeTo(FrameworkElement owner)
         {
-            Point point = new(owner.RenderSize.Width / 2, owner.RenderSize.Height / 2);
+            Point point = new(owner.ActualWidth / 2, owner.ActualHeight / 2);
            return  NodeGraphicsManager.Instance.GetCanvasRelativePoint(owner,point);
         }
 

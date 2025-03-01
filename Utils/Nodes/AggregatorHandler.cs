@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace DirN.Utils.Nodes
 {
-    public abstract class AggregatorHandler<TInput, TOutput> : TypedHandler where TInput : class, ITuple
+    public abstract class AggregatorHandler<TInput, TOutput> : TypedHandler where TInput : ITuple
     {
-        protected override Type[] InputTypes => typeof(TInput).GetGenericArguments();
+        public override Type[] InputTypes => typeof(TInput).GetGenericArguments();
 
-        protected override Type[] OutputTypes => [typeof(TOutput)];
+        public override Type[] OutputTypes => [typeof(TOutput)];
 
         protected override IList<object?> Handle(IList<object?> input)
         {

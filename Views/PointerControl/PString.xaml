@@ -9,8 +9,27 @@
   d:DataContext="{d:DesignInstance Type=pointercontrol:PStringViewModel}"
   d:DesignHeight="450"
   d:DesignWidth="800"
+  Cursor=""
   mc:Ignorable="d">
-  <Grid Cursor="">
-    <TextBox Padding="2,1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="auto" />
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
+    <TextBlock Margin="5,0" VerticalAlignment="Center">
+      <Run Text="{Binding DisplayText}" />
+      <Run Text=" : " />
+    </TextBlock>
+    <ComboBox
+      Grid.Column="1"
+      Padding="5,2"
+      ItemsSource="{Binding StoredWords}"
+      SelectedItem="{Binding SelectedWord, UpdateSourceTrigger=PropertyChanged}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock MaxWidth="50" Text="{Binding Index}" />
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
   </Grid>
 </UserControl>

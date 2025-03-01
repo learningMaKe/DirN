@@ -12,12 +12,6 @@ namespace DirN.Utils.Events.EventType
 {
     public class NodeGraphicsArgs
     {
-        public class AddToCanvasArgs : EventArgs
-        {
-            public UIElement? Element { get; set; }
-            public MouseButtonEventArgs? MouseArgs { get; set; }
-        }
-
         public class LinkArgs : EventArgs
         {
             public ICurve? Curve { get; set; }
@@ -31,6 +25,11 @@ namespace DirN.Utils.Events.EventType
             public UIElement? Element { get; set; }
             public Point ElementRelativePoint { get; set; }
             public Point CanvasRelativePoint { get; set; }
+        }
+
+        public class GetCentralPointArgs : EventArgs
+        {
+            public Point CentralPoint { get; set; }
         }
 
         public class NodeExecutionArgs : EventArgs

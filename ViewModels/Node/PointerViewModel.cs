@@ -39,7 +39,13 @@ namespace DirN.ViewModels.Node
         public PointerViewModel(INode Parent)
         {
             this.NodeParent = Parent;
+            PointerConfigChangedEvent += PointerConfigChanged;
             LoadedCommand = new(Loaded);
+        }
+
+        protected virtual void PointerConfigChanged(PointerConfig config)
+        {
+            
         }
 
         public abstract void UpdateLink();

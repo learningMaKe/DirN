@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.NgManager.Curves;
+using DirN.Utils.Nodes;
 using DirN.Views.Node;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace DirN.ViewModels.Node
         public Brush ConnectorBrush { get; }
 
         public Connector Connector { get; }
+
+        public IPointer PointerParent { get; set; }
 
         public bool IsInput { get; }
 

@@ -13,6 +13,8 @@ namespace DirN.Utils.Nodes
         Output,
         Debug,
         Join,
-        StoredWord
+        SWord,
+        GDir,
+        FileFilter,
     }
 }

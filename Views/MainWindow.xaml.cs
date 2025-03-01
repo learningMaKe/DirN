@@ -1,6 +1,11 @@
-﻿using DirN.Utils.KManager;
+﻿using DirN.Utils;
+using DirN.Utils.Events.EventType;
+using DirN.Utils.KManager;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,15 +30,14 @@ namespace DirN.Views
         public MainWindow(IContainerProvider containerProvider)
         {
             InitializeComponent();
-            KeyManager keyManager=containerProvider.Resolve<KeyManager>();
             IContentDialogService contentDialogService = containerProvider.Resolve<IContentDialogService>();
             contentDialogService.SetDialogHost(RootContentDialog);
-            keyManager.SetKeyReceiver(DirMRoot);
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            Keyboard.Focus(DirMRoot);
+
         }
+
     }
 }

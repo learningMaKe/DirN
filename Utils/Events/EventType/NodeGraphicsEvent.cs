@@ -16,8 +16,6 @@ namespace DirN.Utils.Events.EventType
     {
         public class StoredWordVisibilityEvent : PubSubEvent<bool> { }
 
-        public class AddToCanvasEvent : PubSubEvent<NodeGraphicsArgs.AddToCanvasArgs> { }
-
         public class MakeLinkEvent : PubSubEvent<NodeGraphicsArgs.LinkArgs> { }
 
         public class GetCanvasRelativePointEvent : PubSubEvent<NodeGraphicsArgs.GetCanvasRelativePointArgs> { }
@@ -25,5 +23,7 @@ namespace DirN.Utils.Events.EventType
         public class NodeExecutionEvent: PubSubEvent<NodeGraphicsArgs.NodeExecutionArgs> { }
 
         public class MousePositionEvent : PubSubEvent<NodeGraphicsArgs.MousePositionArgs> { }
+
+        public class GetCentralPointEvent : PubSubEvent<NodeGraphicsArgs.GetCentralPointArgs> { }
     }
 }

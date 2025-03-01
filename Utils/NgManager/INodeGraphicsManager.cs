@@ -15,11 +15,19 @@ namespace DirN.Utils.NgManager
     {
         public bool StoredWordVisiblity { get; set; }
 
+        public double NodeScale { get;  set; }
+
         public ObservableCollection<MenuItemInfo> CanvasContextMenu { get; }
 
-        public ObservableCollection<INode> Nodes { get; }
+        public NodeGroup Nodes { get; }
 
         public ObservableCollection<ICurve> BezierCurves { get; }
+
+        public void MoveNode(Vector delta, bool onlySelected = false);
+
+        public void MultiSelectNodes(Rect rect);
+
+        public void SelectNode(params INode[] nodes);
 
         public void AddNew();
 

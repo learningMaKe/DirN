@@ -23,7 +23,7 @@
       <ColumnDefinition Width="Auto" />
       <ColumnDefinition />
     </Grid.ColumnDefinitions>
-    <Grid Width="10">
+    <Grid Width="10" Visibility="{Binding UseConnector, Converter={StaticResource BooleanToVisibilityConverter}}">
       <local:Connector DataContext="{Binding InputConnector}" />
     </Grid>
     <Grid

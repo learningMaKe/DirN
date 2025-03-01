@@ -9,8 +9,10 @@
   xmlns:node="clr-namespace:DirN.ViewModels.Node"
   xmlns:prism="http://prismlibrary.com/"
   xmlns:proxy="clr-namespace:DirN.Utils.BindingProxy"
+  xmlns:system="clr-namespace:System;assembly=mscorlib"
   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
   d:DataContext="{d:DesignInstance Type=node:BaseNodeViewModel}"
+  Loaded="OnLoaded"
   mc:Ignorable="d">
   <UserControl.Resources>
     <proxy:BindingProxy x:Key="BindingProxy" Data="{Binding}" />
@@ -20,10 +22,15 @@
     <Style BasedOn="{StaticResource DefaultTextBoxStyle}" TargetType="TextBox">
       <Setter Property="Margin" Value="5,2" />
     </Style>
+    <node:NodeAlignment x:Key="NodeAlignmentLeft">Left</node:NodeAlignment>
+    <node:NodeAlignment x:Key="NodeAlignmentTop">Top</node:NodeAlignment>
   </UserControl.Resources>
   <i:Interaction.Triggers>
     <i:EventTrigger EventName="Loaded">
       <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+    </i:EventTrigger>
+    <i:EventTrigger EventName="MouseLeftButtonDown">
+      <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>
   </i:Interaction.Triggers>
 
@@ -31,55 +38,72 @@
     <Viewbox.Effect>
       <DropShadowEffect
         BlurRadius="3"
-        Opacity="0.6"
-        ShadowDepth="3"
+        Opacity="0.1"
+        ShadowDepth="1"
         Color="{Binding Handler.HeaderEffectColor}" />
     </Viewbox.Effect>
 
-    <ui:CardExpander
-      MinWidth="160"
-      Padding="4"
-      Background="{Binding Handler.HeaderBrush}">
-      <ui:CardExpander.Header>
-        <Grid>
-          <Grid.ContextMenu>
-            <ContextMenu DataContext="{StaticResource BindingProxy}">
-              <MenuItem Command="{Binding Data.RemoveCommand}" Header=" 删除节点" />
-              <MenuItem Command="{Binding Data.TestOutputCommand}" Header=" 测试输出" />
-              <MenuItem Command="{Binding Data.CutLinkCommand}" Header=" 切断链接" />
-              <MenuItem Command="{Binding Data.DataFlowCommand}" Header="数据流动" />
-            </ContextMenu>
-          </Grid.ContextMenu>
-          <TextBlock Text="{Binding Handler.Header}" />
+    <Border
+      Padding="3"
+      BorderBrush="{Binding IsSelected, Converter={StaticResource BoolenToWhiteConverter}}"
+      BorderThickness="1"
+      CornerRadius="{StaticResource ControlCornerRadius}">
+      <ui:CardExpander
+        MinWidth="160"
+        Padding="4"
+        Background="{Binding Handler.HeaderBrush}">
+        <ui:CardExpander.Header>
+          <Grid>
+            <Grid.ContextMenu>
+              <ContextMenu DataContext="{StaticResource BindingProxy}">
+                <MenuItem Command="{Binding Data.RemoveCommand}" Header=" 删除节点" />
+                <MenuItem Command="{Binding Data.TestOutputCommand}" Header=" 测试输出" />
+                <MenuItem Command="{Binding Data.CutLinkCommand}" Header=" 切断链接" />
+                <MenuItem Command="{Binding Data.DataFlowCommand}" Header=" 数据流动" />
+                <MenuItem Command="{Binding Data.DebugCommand}" Header=" 调试" />
+                <MenuItem Header="对齐" IsEnabled="{Binding Data.IsSelected}">
+                  <MenuItem
+                    Command="{Binding Data.AlignCommand}"
+                    CommandParameter="{StaticResource NodeAlignmentLeft}"
+                    Header=" 水平对齐" />
+                  <MenuItem
+                    Command="{Binding Data.AlignCommand}"
+                    CommandParameter="{StaticResource NodeAlignmentTop}"
+                    Header=" 垂直对齐" />
+                </MenuItem>
+              </ContextMenu>
+            </Grid.ContextMenu>
+            <TextBlock Text="{Binding Handler.Header}" />
+          </Grid>
+        </ui:CardExpander.Header>
+
+        <Grid Margin="0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <Grid x:Name="PointerGrid" Grid.Row="1">
+            <StackPanel>
+              <ItemsControl ItemsSource="{Binding Handler.OutputGroup}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="{x:Type node:OutputerViewModel}">
+                    <local:Outputer Margin="3" DataContext="{Binding}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <ItemsControl ItemsSource="{Binding Handler.InputGroup}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="{x:Type node:InputerViewModel}">
+                    <local:Inputer Margin="3" DataContext="{Binding}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Grid>
         </Grid>
-      </ui:CardExpander.Header>
 
-      <Grid Margin="0">
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
-          <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <Grid x:Name="PointerGrid" Grid.Row="1">
-          <StackPanel>
-            <ItemsControl ItemsSource="{Binding Handler.OutputGroup}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type node:OutputerViewModel}">
-                  <local:Outputer DataContext="{Binding}" />
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <ItemsControl ItemsSource="{Binding Handler.InputGroup}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type node:InputerViewModel}">
-                  <local:Inputer DataContext="{Binding}" />
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </StackPanel>
-        </Grid>
-      </Grid>
-
-    </ui:CardExpander>
+      </ui:CardExpander>
+    </Border>
   </Viewbox>
 </UserControl>

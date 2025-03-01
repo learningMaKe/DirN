@@ -10,9 +10,9 @@ namespace DirN.Utils.Nodes
 {
     public abstract class ScattererHandler<TInput, TOutput> : TypedHandler where TOutput : class, ITuple where TInput : class
     {
-        protected override Type[] InputTypes => [typeof(TInput)];
+        public override Type[] InputTypes => [typeof(TInput)];
 
-        protected override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
+        public override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
 
         protected override IList<object?> Handle(IList<object?> input)
         {

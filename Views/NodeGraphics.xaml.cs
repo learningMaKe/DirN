@@ -26,6 +26,10 @@ namespace DirN.Views
         public NodeGraphics()
         {
             InitializeComponent();
+            if(this.DataContext is IViewGetter viewGetter)
+            {
+                viewGetter.GetView = () => this;
+            }
         }
     }
 }

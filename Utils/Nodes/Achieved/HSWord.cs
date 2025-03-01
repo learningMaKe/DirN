@@ -1,4 +1,5 @@
-﻿using DirN.ViewModels.Node;
+﻿using DirN.Utils.Nodes.Attributes;
+using DirN.ViewModels.Node;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace DirN.Utils.Nodes.Achieved
 {
-    public class StoredWordHandler : TypedHandler
+    [HDes("保留字")]
+    public class HSWord : TypedHandler
     {
-        protected override Type[] InputTypes => [];
+        public override Type[] InputTypes => [];
 
-        protected override Type[] OutputTypes => [typeof(string)];
+        public override Type[] OutputTypes => [typeof(string)];
 
         protected override IList<object?> Handle(IList<object?> input)
         {

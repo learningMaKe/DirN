@@ -14,6 +14,8 @@ namespace DirN.ViewModels.Node
 
         public bool AcceptExternal { get; set; } = false;
 
+        public bool UseConnector { get; set; } = true;
+
         public IConnector InputConnector { get; private set; }
 
         public IPContainer PointerContainer { get; private set; }
@@ -33,6 +35,11 @@ namespace DirN.ViewModels.Node
         public override void CutLink()
         {
             InputConnector.CutLink();
+        }
+
+        protected override void PointerConfigChanged(PointerConfig config)
+        {
+            UseConnector = config.UseConnector;
         }
 
         protected override object? GetData()

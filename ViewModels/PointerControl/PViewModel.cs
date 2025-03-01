@@ -9,20 +9,10 @@ using System.Windows.Controls;
 
 namespace DirN.ViewModels.PointerControl
 {
-    public abstract class PViewModel<TView,TViewModel>:BindableBase,IPointerControl where TView:UserControl,new() where TViewModel:IPointerControl,new()
+    public abstract class PViewModel:BindableBase,IPointerControl 
     {
         public IPContainer? Parent { get; set; }
         public IPointer? PointerParent { get; set; }
-
-        public static TView Create()
-        {
-            TViewModel vm = new();
-            TView view = new()
-            {
-                DataContext = vm
-            };
-            return view;
-        }
 
         public void Init(IPContainer parent) 
         {

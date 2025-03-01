@@ -20,15 +20,16 @@
     <i:EventTrigger EventName="Loaded">
       <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
     </i:EventTrigger>
+
   </i:Interaction.Triggers>
   <Grid
     x:Name="GraphicsGrid"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
     Background="Transparent">
-
-
-    <local:NodeCanvas />
+    <Grid x:Name="MainCanvas">
+      <local:NodeCanvas />
+    </Grid>
 
     <local:ViewStored />
 

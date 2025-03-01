@@ -29,7 +29,7 @@
       <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>
   </i:Interaction.Triggers>
-  <Grid Background="Transparent">
+  <Grid x:Name="MainCanvas" Background="Transparent">
     <Grid.ContextMenu>
       <ContextMenu DataContext="{StaticResource BindingProxy}" ItemsSource="{Binding Data.NodeGraphicsManager.CanvasContextMenu}">
         <ContextMenu.ItemContainerStyle>
@@ -46,74 +46,105 @@
         </ContextMenu.ItemTemplate>
       </ContextMenu>
     </Grid.ContextMenu>
-    <Button
-      HorizontalAlignment="Center"
-      VerticalAlignment="Top"
-      Command="{Binding TestCommand}"
-      Content="Test" />
-    <!--  Line Canvas  -->
-    <ItemsControl ItemsSource="{Binding NodeGraphicsManager.BezierCurves}">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <Canvas />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Path Stroke="{Binding Brush}" StrokeThickness="{Binding Thickness}">
-            <Path.Data>
-              <PathGeometry>
-                <PathFigure StartPoint="{Binding StartPoint}">
-                  <BezierSegment
-                    Point1="{Binding ControlPoint1}"
-                    Point2="{Binding ControlPoint2}"
-                    Point3="{Binding EndPoint}" />
-                </PathFigure>
-              </PathGeometry>
-            </Path.Data>
-          </Path>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
 
-    <!--  Node Canvas  -->
-    <ItemsControl x:Name="NodeItems" ItemsSource="{Binding NodeGraphicsManager.Nodes}">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <Canvas />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemContainerStyle>
-        <Style TargetType="{x:Type ContentPresenter}">
-          <Setter Property="Canvas.Left" Value="{Binding Position.X}" />
-          <Setter Property="Canvas.Top" Value="{Binding Position.Y}" />
-          <Setter Property="Panel.ZIndex" Value="{Binding ZIndex}" />
-        </Style>
-      </ItemsControl.ItemContainerStyle>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Thumb>
-            <i:Interaction.Triggers>
-              <i:EventTrigger EventName="DragDelta">
-                <i:InvokeCommandAction Command="{Binding DragDeltaCommand}" PassEventArgsToCommand="True" />
-              </i:EventTrigger>
-              <i:EventTrigger EventName="DragStarted">
-                <i:InvokeCommandAction Command="{Binding DragStartedCommand}" PassEventArgsToCommand="True" />
-              </i:EventTrigger>
-              <i:EventTrigger EventName="DragCompleted">
-                <i:InvokeCommandAction Command="{Binding DragCompletedCommand}" PassEventArgsToCommand="True" />
-              </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <Thumb.Template>
-              <ControlTemplate>
-                <nodes:BaseNode DataContext="{Binding}" />
-              </ControlTemplate>
-            </Thumb.Template>
-          </Thumb>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
+    <!--  Multi Selections  -->
+    <Canvas
+      x:Name="MultiSelection"
+      Panel.ZIndex="{Binding SelectionZIndex}"
+      Background="Transparent">
+      <i:Interaction.Triggers>
+        <i:EventTrigger EventName="MouseLeftButtonDown">
+          <i:InvokeCommandAction Command="{Binding SelectionStartCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseLeftButtonUp">
+          <i:InvokeCommandAction Command="{Binding SelectionEndCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseMove">
+          <i:InvokeCommandAction Command="{Binding SelectionMoveCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+      </i:Interaction.Triggers>
+      <Border
+        Canvas.Left="{Binding LeftTopPoint.X}"
+        Canvas.Top="{Binding LeftTopPoint.Y}"
+        Width="{Binding SelectionSize.Width}"
+        Height="{Binding SelectionSize.Height}"
+        Background="#3039"
+        BorderBrush="AliceBlue"
+        Visibility="{Binding SelectionShow, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </Canvas>
+    <Grid
+      x:Name="CanvasContainer"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch">
+      <Grid.RenderTransform>
+        <ScaleTransform CenterX="{Binding ElementName=CanvasContainer, Path=ActualWidth, Converter={StaticResource Divide2Converter}}" CenterY="{Binding ElementName=CanvasContainer, Path=ActualHeight, Converter={StaticResource Divide2Converter}}" ScaleX="{Binding NodeGraphicsManager.NodeScale}" ScaleY="{Binding NodeGraphicsManager.NodeScale}" />
+      </Grid.RenderTransform>
 
-    </ItemsControl>
+      <!--  Line Canvas  -->
+      <ItemsControl ItemsSource="{Binding NodeGraphicsManager.BezierCurves}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Path Stroke="{Binding Brush}" StrokeThickness="{Binding Thickness}">
+              <Path.Data>
+                <PathGeometry>
+                  <PathFigure StartPoint="{Binding StartPoint}">
+                    <BezierSegment
+                      Point1="{Binding ControlPoint1}"
+                      Point2="{Binding ControlPoint2}"
+                      Point3="{Binding EndPoint}" />
+                  </PathFigure>
+                </PathGeometry>
+              </Path.Data>
+            </Path>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!--  Node Canvas  -->
+      <ItemsControl x:Name="NodeItems" ItemsSource="{Binding NodeGraphicsManager.Nodes}">
+
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemContainerStyle>
+          <Style TargetType="{x:Type ContentPresenter}">
+            <Setter Property="Canvas.Left" Value="{Binding Position.X}" />
+            <Setter Property="Canvas.Top" Value="{Binding Position.Y}" />
+            <Setter Property="Panel.ZIndex" Value="{Binding ZIndex}" />
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Thumb>
+              <i:Interaction.Triggers>
+                <i:EventTrigger EventName="DragDelta">
+                  <i:InvokeCommandAction Command="{Binding DragDeltaCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="DragStarted">
+                  <i:InvokeCommandAction Command="{Binding DragStartedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="DragCompleted">
+                  <i:InvokeCommandAction Command="{Binding DragCompletedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+              </i:Interaction.Triggers>
+              <Thumb.Template>
+                <ControlTemplate>
+                  <nodes:BaseNode DataContext="{Binding}" />
+                </ControlTemplate>
+              </Thumb.Template>
+            </Thumb>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+
+      </ItemsControl>
+    </Grid>
 
     <Canvas x:Name="DecorateCanvas" />
   </Grid>

@@ -38,10 +38,8 @@ namespace DirN.Views
 
         private void OnStoredWordVisibilityChanged(bool isVisible)
         {
-
             double currentX = StoredWordList.RenderTransform.Value.OffsetX;
             double To = isVisible ? -(StoredWordList.ActualWidth + 10) : 0;
-            Debug.WriteLine("currentX: " + currentX + " To: " + To);
             DoubleAnimation animation = new();
             {
                 animation.From = currentX;

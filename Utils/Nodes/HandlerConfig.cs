@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 
 namespace DirN.Utils.Nodes
 {
-    public class HandlerConfig(string Header, Func<INode, INodeHandler> Create)
+    public class HandlerConfig
     {
-        public string Header { get; set; } = Header;
+        public HandlerConfig(string Header, Func<INode, INodeHandler> Create)
+        {
+            this.Header = Header;
+            this.Create = Create;
+        }
 
-        public Func<INode, INodeHandler> Create { get; set; } = Create;
+        public string Header { get; set; }
+
+        public Func<INode, INodeHandler> Create { get; set; }
 
     }
 }

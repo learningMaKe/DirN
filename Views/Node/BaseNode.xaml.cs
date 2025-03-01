@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -29,6 +30,14 @@ namespace DirN.Views.Node
         private void OnDragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
         {
             Debug.WriteLine("OnDragDelta");
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is IViewGetter viewGetter)
+            {
+                viewGetter.GetView = () => this;
+            }
         }
     }
 }

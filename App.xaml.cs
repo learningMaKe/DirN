@@ -1,5 +1,6 @@
 ﻿using DirN.Utils;
 using DirN.Utils.CommandLine;
+using DirN.Utils.Debugs;
 using DirN.Utils.DirManager;
 using DirN.Utils.KManager;
 using DirN.Utils.NgManager;
@@ -41,10 +42,12 @@ public partial class App
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
         containerRegistry.RegisterInstance(CommandLineArgs);
+        containerRegistry.RegisterSingleton<MainManager>();
         containerRegistry.RegisterSingleton<IContentDialogService, ContentDialogService>();
         containerRegistry.RegisterSingleton<KeyManager>();
         containerRegistry.RegisterSingleton<DirectoryManager>();
         containerRegistry.RegisterSingleton<PreviewerManager>();
+
         containerRegistry.RegisterSingleton<INodeGraphicsManager, NodeGraphicsManager>();
 
     }

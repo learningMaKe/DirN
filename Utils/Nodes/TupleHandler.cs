@@ -15,8 +15,8 @@ namespace DirN.Utils.Nodes
             
         }
 
-        protected override Type[] InputTypes => typeof(TInput).GetGenericArguments();
-        protected override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
+        public override Type[] InputTypes => typeof(TInput).GetGenericArguments();
+        public override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
 
         protected override IList<object?> Handle(IList<object?> input)
         {

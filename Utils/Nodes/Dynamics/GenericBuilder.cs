@@ -10,11 +10,11 @@ namespace DirN.Utils.Nodes.Dynamics
 {
     public static class GenericBuilder
     {
-        public static T? MakeTuple<T>(params object?[] values) where T : class, ITuple
+        public static T? MakeTuple<T>(params object?[] values) where T :ITuple
         {
             Type[] tupleTypes = typeof(T).GetGenericArguments();
             // 创建元组类型
-            Type? tupleType = Type.GetType($"System.Tuple`{tupleTypes.Length}");
+            Type? tupleType = Type.GetType($"System.ValueTuple`{tupleTypes.Length}");
 
             if (tupleType == null) return default;
 
@@ -27,12 +27,14 @@ namespace DirN.Utils.Nodes.Dynamics
             if (constructor is null) return default;
 
             // 创建元组实例
-            object? tupleInstance = Activator.CreateInstance(genericTupleType, [.. values]);
+            object? tupleInstance = constructor.Invoke([.. values]);
 
-            return tupleInstance as T;
+            T? tuple = (T?)tupleInstance;
+            if (tuple is null) return default;
+            return tuple;
         }
 
-        public  static IList<object?> UnpackTuple<T>(ITuple tuple) where T : class, ITuple
+        public  static IList<object?> UnpackTuple<T>(ITuple tuple) where T : ITuple
         {
             Type type = typeof(T);
             Type[] tupleTypes = type.GetGenericArguments();
@@ -44,9 +46,6 @@ namespace DirN.Utils.Nodes.Dynamics
                 values.Add(property.GetValue(tuple));
             }
             return values;
-
-
-
         }
     }
 }

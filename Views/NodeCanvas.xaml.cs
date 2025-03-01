@@ -1,4 +1,5 @@
-﻿using DirN.Utils.Events.EventType;
+﻿using DirN.Utils.Debugs;
+using DirN.Utils.Events.EventType;
 using DirN.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ namespace DirN.Views
         {
             if (viewModel == null) return;
             viewModel!.GetView += () => this;
+            DebugManager.Instance.DebugCanvas = DecorateCanvas;
         }
 
         

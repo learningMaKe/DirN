@@ -1,28 +1,31 @@
-﻿using DirN.Utils.NgManager;
+﻿using DirN.Utils.Nodes.Attributes;
 using DirN.ViewModels.Node;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace DirN.Utils.Nodes.Achieved
 {
-    public class OutputHandler : TypedHandler
+    [HDes("调试")]
+    public class HDebug : TypedHandler
     {
-        protected override Type[] InputTypes => [typeof(object)];
+        public override Type[] InputTypes => [typeof(object)];
 
-        protected override Type[] OutputTypes => [];
+        public override Type[] OutputTypes => [];
 
         public override void Init(INode parent)
         {
             base.Init(parent);
-            Header = "输出";
+            Header = "调试节点";
         }
 
         protected override IList<object?> Handle(IList<object?> input)
         {
-            NodeGraphicsManager.Instance.ShowText("输出：" + input[0]);
+            string s = string.Join(",", input.Select(x => x ?? "null"));
+            MessageBox.Show(s);
             return [];
         }
     }

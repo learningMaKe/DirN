@@ -1,8 +1,12 @@
-﻿using DirN.Utils.Events.EventType;
+﻿using DirN.Utils.Debugs;
+using DirN.Utils.Events.EventType;
+using DirN.Utils.KManager;
+using DirN.Utils.KManager.HKey;
 using DirN.Utils.NgManager;
 using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
 using DirN.ViewModels.Node;
+using PropertyChanged;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,11 +20,20 @@ using System.Windows.Media;
 
 namespace DirN.ViewModels
 {
-    public class NodeCanvasViewModel : BaseViewModel
+    public class NodeCanvasViewModel : BaseViewModel,IViewGetter
     {
-        private UIElement? view;
+        private FrameworkElement? view;
 
-        public UIElement View
+        private Point PreviousPoint;
+        private DateTime LastMoveTime;
+        
+        private Point StartPoint;
+        public bool SelectionShow { get; set; }
+        public int SelectionZIndex { get; set; }
+        public Point LeftTopPoint { get; set; }
+        public Size SelectionSize { get; set; }
+
+        public FrameworkElement View
         {
             get
             {
@@ -31,13 +44,15 @@ namespace DirN.ViewModels
 
         public INodeGraphicsManager NodeGraphicsManager { get;set; }
 
-        public DelegateCommand TestCommand { get; set; }
         public DelegateCommand<MouseEventArgs> MouseMoveCommand { get; set; }
         public DelegateCommand<MouseButtonEventArgs> MouseLeftButtonUpCommand { get; set; }
+        public DelegateCommand<MouseButtonEventArgs> SelectionStartCommand { get; set; }
+        public DelegateCommand<MouseButtonEventArgs> SelectionEndCommand { get; set; }
+        public DelegateCommand<MouseEventArgs> SelectionMoveCommand { get; set; }
 
-        public Action<NodeGraphicsArgs.AddToCanvasArgs>? AddToCanvasEvent { get; set; }
         public Action<NodeGraphicsArgs.LinkArgs>? MakeLinkEvent { get; set; }
-        public Func<UIElement>? GetView { get; set; }
+        
+        public Func<FrameworkElement>? GetView { get; set; }
 
         private NodeGraphicsArgs.LinkArgs? FocusedLink;
 
@@ -45,14 +60,75 @@ namespace DirN.ViewModels
         {
             NodeGraphicsManager = provider.Resolve<INodeGraphicsManager>();
 
-            TestCommand = new(Test);
             MouseMoveCommand = new(MouseMove);
             MouseLeftButtonUpCommand = new(MouseLeftButtonUp);
+            SelectionStartCommand = new(SelectionStart);
+            SelectionEndCommand = new(SelectionEnd);
+            SelectionMoveCommand = new(SelectionMove);
 
-            EventAggregator.GetEvent<NodeGraphicsEvent.AddToCanvasEvent>().Subscribe(AddToCanvas);
+            KeyManager.Instance.RegisterEvent<MouseEventArgs>(EventId.Mouse_Middle_Pressed, GraphicsMove);
+
             EventAggregator.GetEvent<NodeGraphicsEvent.MakeLinkEvent>().Subscribe(MakeLink);
             EventAggregator.GetEvent<NodeGraphicsEvent.GetCanvasRelativePointEvent>().Subscribe(GetCanvasRelativePoint);
             EventAggregator.GetEvent<NodeGraphicsEvent.MousePositionEvent>().Subscribe(MousePosition);
+            EventAggregator.GetEvent<NodeGraphicsEvent.GetCentralPointEvent>().Subscribe(GetCentralPoint);
+        }
+
+        private void SelectionStart(MouseButtonEventArgs e)
+        {
+            StartPoint = e.GetPosition(View);
+            GetRectancle(e);
+            SelectionShow = true;
+            SelectionZIndex = 1000;
+
+        }
+
+        private void SelectionEnd(MouseButtonEventArgs e)
+        {
+            SelectionShow = false;
+            SelectionZIndex = 0;
+
+            Rect rect = new(LeftTopPoint, SelectionSize);
+            NodeGraphicsManager.MultiSelectNodes(rect);
+
+        }
+
+        private void SelectionMove(MouseEventArgs e)
+        {
+            if (!SelectionShow) return;
+            GetRectancle(e);
+        }
+
+        private void GetRectancle(MouseEventArgs e)
+        {
+            var (point1, point2) = GetRectancle(StartPoint, e.GetPosition(View));
+            if (point1.X < 0 || point1.Y < 0 || point2.Width < 0 || point2.Height < 0) return;
+            (LeftTopPoint, SelectionSize) = (point1, point2);
+        }
+
+        private static (Point, Size) GetRectancle(Point point1, Point point2)
+        {
+            Point leftTop = new(Math.Min(point1.X, point2.X), Math.Min(point1.Y, point2.Y));
+            Size size = new(Math.Max(point1.X, point2.X)- leftTop.X, Math.Max(point1.Y, point2.Y)- leftTop.Y);
+            return (leftTop, size);
+        }
+
+        private void GetCentralPoint(NodeGraphicsArgs.GetCentralPointArgs args)
+        {
+            args.CentralPoint = new Point(View.ActualWidth / 2, View.ActualHeight / 2);
+        }
+
+        private void GraphicsMove(MouseEventArgs args)
+        {
+            Point currentPoint = Mouse.GetPosition(View);
+            if(DateTime.Now - LastMoveTime > TimeSpan.FromMilliseconds(30))
+            {
+                PreviousPoint = currentPoint;
+            }
+            Vector vector = currentPoint - PreviousPoint;
+            NodeGraphicsManager.MoveNode(vector);
+            PreviousPoint = currentPoint;
+            LastMoveTime = DateTime.Now;
         }
 
         private void MousePosition(NodeGraphicsArgs.MousePositionArgs args)
@@ -100,15 +176,5 @@ namespace DirN.ViewModels
             }
         }
 
-        private void Test()
-        {
-           
-
-        }
-
-        private void AddToCanvas(NodeGraphicsArgs.AddToCanvasArgs e)
-        {
-            AddToCanvasEvent?.Invoke(e);
-        }
     }
 }

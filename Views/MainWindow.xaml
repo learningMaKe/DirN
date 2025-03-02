@@ -29,9 +29,6 @@
     <i:EventTrigger EventName="KeyUp">
       <i:InvokeCommandAction Command="{Binding KeyUpCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>
-    <i:EventTrigger EventName="MouseWheel">
-      <i:InvokeCommandAction Command="{Binding MouseWheelCommand}" PassEventArgsToCommand="True" />
-    </i:EventTrigger>
     <i:EventTrigger EventName="MouseDown">
       <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>

@@ -13,16 +13,17 @@ namespace DirN.Utils.Nodes.Maps
 {
     public class DataConverterMap : IMapCreator<(Type, Type), IDataConverter>
     {
-        private static KeyValuePair<(Type, Type), IDataConverter> MP<TDataConverter>(Type sourceType, Type targetType) where TDataConverter : IDataConverter, new()
+        private static KeyValuePair<(Type, Type), IDataConverter> MP<TDataConverter,TSource,TTarget>() where TDataConverter : IDataConverter, new()
         {
-            return new KeyValuePair<(Type, Type), IDataConverter>((sourceType, targetType), new TDataConverter());
+            return new KeyValuePair<(Type, Type), IDataConverter>((typeof(TSource), typeof(TTarget)), new TDataConverter());
         }
 
         public void Create(Dictionary<(Type, Type), IDataConverter> source)
         {
             source.
-                Set(MP<DCString2FileInfo>(typeof(string), typeof(FileInfo))).
-                Set(MP<DCString2DirectoryInfo>(typeof(string), typeof(DirectoryInfo)));
+                Set(MP<DCString2FileInfo,string,FileInfo>()).
+                Set(MP<DCString2DirectoryInfo,string,DirectoryInfo>()).
+                Set(MP<DCString2FileInfoArray, string, FileInfo[]>());
 
         }
     }

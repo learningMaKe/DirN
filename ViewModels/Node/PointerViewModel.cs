@@ -5,6 +5,7 @@ using DirN.ViewModels.PointerControl;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 
 namespace DirN.ViewModels.Node
 {
+    [DebuggerDisplay("{PointerType}")]
     public abstract class PointerViewModel:BindableBase,IPointer
     {
         public INode NodeParent { get;private set; }
@@ -79,7 +81,7 @@ namespace DirN.ViewModels.Node
 
         private void Loaded()
         {
-            OnPointerTypeChanged();
+
         }
     }
 }

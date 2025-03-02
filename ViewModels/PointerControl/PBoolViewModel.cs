@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace DirN.ViewModels.PointerControl
 {
-    public class PFileInfoViewModel : PViewModel
+    public class PBoolViewModel:PViewModel
     {
+        public bool IsChecked { get; set; } = false;
+
         public override object? GetData()
         {
-            throw new NotImplementedException();
+            return IsChecked;
         }
     }
 }

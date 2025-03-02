@@ -31,12 +31,26 @@ namespace DirN.Utils.NgManager
         private const double MaxNodeScale = 1.5;
         private const double MinNodeScale = 0.3;
         private const double NodeScaleStep = 0.01;
+
+        private Point? centralPoint;
         #endregion
 
         public static readonly string DefaultText = "undefined";
 
         #region Properties
         public double NodeScale { get; set; } = 1;
+
+        public Point CentralPoint
+        {
+            get
+            {
+                if (centralPoint == null)
+                {
+                    centralPoint = GetCentralPoint();
+                }
+                return centralPoint.Value;
+            }
+        }
 
         public ObservableCollection<MenuItemInfo> CanvasContextMenu { get; private set; } = [];
 
@@ -62,9 +76,6 @@ namespace DirN.Utils.NgManager
             keyManager.RegisterEvent<KeyEventArgs>(EventId.V_StoredWord, OnKeyEnter);
             keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Focus, e => FocusNode());
 
-            keyManager.RegisterEvent<MouseWheelEventArgs>(EventId.Node_Enlarge, NodeEnlarge);
-            keyManager.RegisterEvent<MouseWheelEventArgs>(EventId.Node_Shrink, NodeShrink);
-
             keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_SelectAll, e => Nodes.SelectAll());
             keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_DeleteSelected, e => Nodes.DeleteSelectedNodes());
 
@@ -79,6 +90,14 @@ namespace DirN.Utils.NgManager
             foreach (var node in selectedNodes)
             {
                 node.Move(delta);
+            }
+        }
+
+        public void UpdateLink()
+        {
+            foreach (var node in Nodes)
+            {
+                node.UpdateLink();
             }
         }
 
@@ -116,6 +135,7 @@ namespace DirN.Utils.NgManager
             Point centralPoint = GetCentralPoint();
             Vector delta = centralPoint - nodeCenter;
             MoveNode(delta);
+            UpdateLink();
         }
 
         public void AlignNode(INode node, NodeAlignment alignment)
@@ -238,7 +258,7 @@ namespace DirN.Utils.NgManager
                 ElementRelativePoint = pointRelativeToElement
             };
             eventAggregator.GetEvent<NodeGraphicsEvent.GetCanvasRelativePointEvent>().Publish(args);
-            return args.CanvasRelativePoint.ScaleTransform(GetCentralPoint(), 1 / NodeScale);
+            return args.CanvasRelativePoint;
         }
 
         public Point GetCanvasMousePosition()
@@ -246,6 +266,16 @@ namespace DirN.Utils.NgManager
             NodeGraphicsArgs.MousePositionArgs args = new();
             eventAggregator.GetEvent<NodeGraphicsEvent.MousePositionEvent>().Publish(args);
             return args.MousePosition;
+        }
+
+        public void ZoomIn()
+        {
+            NodeScale = Math.Min(MaxNodeScale, NodeScale + NodeScaleStep);
+        }
+
+        public void ZoomOut()
+        {
+            NodeScale = Math.Max(MinNodeScale, NodeScale - NodeScaleStep);
         }
 
         #endregion
@@ -297,6 +327,7 @@ namespace DirN.Utils.NgManager
         {
             NodeScale = Math.Max(MinNodeScale, NodeScale - NodeScaleStep);
         }
+
 
         #endregion
     }

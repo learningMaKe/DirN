@@ -16,6 +16,15 @@ namespace DirN.ViewModels.Node
     {
         protected ICurve? InputCurve;
 
+        public override IList<INode> LinkedNodes { 
+            get 
+            {
+                if (InputCurve == null) return [];
+                if (InputCurve.StartPointOwner == null) return [];
+                return [InputCurve.StartPointOwner.PointerParent.NodeParent];
+            }
+        } 
+
         public InputConnectorViewModel(PointerViewModel parent) : base(parent)
         {
 

@@ -21,8 +21,6 @@ namespace DirN.Utils.Nodes
             {
                 Parent = parent
             };
-            handler.InputGroup = HandlerBulider.Pointer<InputerViewModel>(parent, handler.InputTypes);
-            handler.OutputGroup = HandlerBulider.Pointer<OutputerViewModel>(parent, handler.OutputTypes);
             handler.Init(parent);
             return handler;
         }
@@ -41,7 +39,7 @@ namespace DirN.Utils.Nodes
         /// <returns></returns>
         public static HandlerConfig CC<THandler>(string Header) where THandler : TypedHandler, new()=> CreateConfig<THandler>(Header);
     
-        public static HandlerConfig? CC(Type type, string Header)
+        public static HandlerConfig? CC(Type type, string Header,string description = "")
         {
             if (!typeof(TypedHandler).IsAssignableFrom(type))
             {
@@ -66,7 +64,7 @@ namespace DirN.Utils.Nodes
                 return null;
             }
             HandlerConfig config = (HandlerConfig)ci.Invoke([Header, func]);
-
+            config.Description = description;
             return config;
         }
     }

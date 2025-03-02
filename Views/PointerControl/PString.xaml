@@ -12,14 +12,6 @@
   Cursor=""
   mc:Ignorable="d">
   <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="auto" />
-      <ColumnDefinition />
-    </Grid.ColumnDefinitions>
-    <TextBlock Margin="5,0" VerticalAlignment="Center">
-      <Run Text="{Binding DisplayText}" />
-      <Run Text=" : " />
-    </TextBlock>
     <ComboBox
       Grid.Column="1"
       Padding="5,2"

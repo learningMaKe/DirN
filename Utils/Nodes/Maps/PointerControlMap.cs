@@ -22,7 +22,8 @@ namespace DirN.Utils.Nodes.Maps
                 Set(PCT.PInt, FA.Create<PInt, PIntViewModel>).
                 Set(PCT.PAny, FA.Create<PAny, PAnyViewModel>).
                 Set(PCT.PFileInfo, FA.Create<PFileInfo, PFileInfoViewModel>).
-                Set(PCT.PFilterSelection, FA.Create<PFilterSelection, PFilterSelectionViewModel>);
+                Set(PCT.PEnum, FA.Create<PEnum, PEnumViewModel>).
+                Set(PCT.PBool, FA.Create<PBool, PBoolViewModel>);
             
         }
 

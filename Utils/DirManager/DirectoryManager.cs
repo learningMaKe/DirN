@@ -1,10 +1,13 @@
 ﻿using DirN.Utils.CommandLine;
 using DirN.Utils.Events.EventType;
 using DryIoc.FastExpressionCompiler.LightExpression;
+using Newtonsoft.Json.Linq;
 using Prism.Events;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,35 +19,17 @@ using static DirN.Utils.Events.EventType.DirectoryManagerEvent;
 
 namespace DirN.Utils.DirManager
 {
-    public class DirectoryManager:BindableBase
+    public class DirectoryManager:ManagerBase<DirectoryManager>
     {
-        private readonly IEventAggregator eventAggregator;
-
-        private readonly IContentDialogService contentDialogService;
-
         private readonly ApplicationParameter applicationParameter;
-
-        private static DirectoryManager? instance;
-
-        public static DirectoryManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    throw new NullReferenceException("DirectoryManager instance is null. Please initialize it first.");
-                }
-                return instance;
-            }
-        }
 
         public static string UserProfilePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
-        private string directory = UserProfilePath;
+        private string workDirectory = UserProfilePath;
 
-        public string Directory
+        public string WorkDirectory
         {
-            get => directory;
+            get => workDirectory;
             set
             {
                 if (!System.IO.Directory.Exists(value))
@@ -57,22 +42,30 @@ namespace DirN.Utils.DirManager
                     });
                     return;
                 }
-                eventAggregator.GetEvent<DirectoryChangedEvent>().Publish(value);
-                directory = value;
+                workDirectory = value;
+                OnWorkDirectoryChanged();
             }
         }
 
-        public event EventHandler<string>? OnDirectoryChanged;
+        public ObservableCollection<string> Files { get; set; } = [];
 
-        public DirectoryManager(IContainerProvider containerProvider)
+        public ObservableCollection<string> PreviewFiles { get; set; } = [];
+
+        public DirectoryManager(IContainerProvider containerProvider):base(containerProvider)
         {
-            instance = this;
-
-            eventAggregator = containerProvider.Resolve<IEventAggregator>();
             applicationParameter = containerProvider.Resolve<ApplicationParameter>();
-            contentDialogService = containerProvider.Resolve<IContentDialogService>();
+            
+            WorkDirectory = applicationParameter.Directory;
+        }
 
-            Directory = applicationParameter.Directory;
+        private void OnWorkDirectoryChanged()
+        {
+            eventAggregator.GetEvent<DirectoryChangedEvent>().Publish(WorkDirectory);
+            Files.Clear();
+            if (Directory.Exists(WorkDirectory))
+            {
+                Files = [.. Directory.GetFiles(WorkDirectory)];
+            }
         }
 
 

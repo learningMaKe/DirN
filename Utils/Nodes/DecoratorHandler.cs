@@ -8,9 +8,9 @@ namespace DirN.Utils.Nodes
 {
     public abstract class DecoratorHandler<TInput, TOutput> : TypedHandler
     {
-        public override Type[] InputTypes => [typeof(TInput)];
+        protected override Type[] InputTypes => [typeof(TInput)];
 
-        public override Type[] OutputTypes => [typeof(TOutput)];
+        protected override Type[] OutputTypes => [typeof(TOutput)];
 
         protected override IList<object?> Handle(IList<object?> input)
         {

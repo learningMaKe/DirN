@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace DirN.Views.PointerControl
 {
     /// <summary>
-    /// PFilterSelection.xaml 的交互逻辑
+    /// PEnum.xaml 的交互逻辑
     /// </summary>
-    public partial class PFilterSelection : UserControl
+    public partial class PEnum : UserControl
     {
-        public PFilterSelection()
+        public PEnum()
         {
             InitializeComponent();
         }

@@ -17,6 +17,8 @@ namespace DirN.Utils.Nodes
 
         public string Header { get; set; }
 
+        public string Description { get; set; } = string.Empty;
+
         public Func<INode, INodeHandler> Create { get; set; }
 
     }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DirN.Utils.Nodes.Achieved.Utils
 {
-    [HPCDes("过滤方式",false,PointerControlType.PFilterSelection)]
+    [HPDes("筛选方式","通过文件名或扩展名进行过滤",  false,PointerControlType.PEnum)]
     public enum FilterBy
     {
         [Des("文件名")]

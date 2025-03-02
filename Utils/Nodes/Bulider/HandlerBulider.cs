@@ -10,16 +10,22 @@ namespace DirN.Utils.Nodes.Bulider
 {
     public class HandlerBulider
     {
-        public static ObservableCollection<IPointer> Pointer<TPointer>(INode parent, params Type[] pointerTypes) where TPointer:PointerViewModel
+        public static Dictionary<string, IPointer> Pointer<TPointer>(INode parent, params Type[] pointerTypes) where TPointer:PointerViewModel
         {
-            ObservableCollection<IPointer> pointers = [];
+            Dictionary<string, IPointer> pointerDict = [];
             foreach (var pointerType in pointerTypes)
             {
                 IPointer pointer= (IPointer?)Activator.CreateInstance(typeof(TPointer), parent) ?? throw new NullReferenceException("Pointer is null");
                 pointer.PointerType = pointerType;
-                pointers.Add(pointer);
+                int index = 0;
+                while (pointerDict.ContainsKey(pointerType.Name + index))
+                {
+                    index++;
+                }
+                string key = pointerType.Name + index;
+                pointerDict.Add(key, pointer);
             }
-            return pointers;
+            return pointerDict;
         }
     }
 }

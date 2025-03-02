@@ -43,7 +43,8 @@ namespace DirN.Views
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (viewModel == null) return;
-            viewModel!.GetView += () => this;
+            viewModel!.GetCanvas += () => CanvasContainer;
+            viewModel!.GetView += () => MainCanvas;
             DebugManager.Instance.DebugCanvas = DecorateCanvas;
         }
 

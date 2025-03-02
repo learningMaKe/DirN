@@ -9,9 +9,9 @@ using System.Windows.Media;
 namespace DirN.Utils.Nodes.Attributes
 {
     [AttributeUsage(AttributeTargets.Class|AttributeTargets.Enum)]
-    public class HPCDesAttribute:Attribute
+    public class HPDesAttribute:Attribute
     {
-        public HPCDesAttribute(string Header, bool UseConnector = true, PointerControlType ControlType = PointerControlType.PAny, string PointerColor = "Black")
+        public HPDesAttribute(string Header,  bool UseConnector = true, PointerControlType ControlType = PointerControlType.PAny, string PointerColor = "Black")
         {
             this.Header = Header;
             this.UseConnector = UseConnector;
@@ -19,7 +19,17 @@ namespace DirN.Utils.Nodes.Attributes
             this.ControlType = ControlType;
         }
 
+        public HPDesAttribute(string Header,string Description = "", bool UseConnector = true, PointerControlType ControlType = PointerControlType.PAny, string PointerColor = "Black")
+        {
+            this.Header = Header;
+            this.Description = Description;
+            this.UseConnector = UseConnector;
+            this.PointerColor = (Color)ColorConverter.ConvertFromString(PointerColor);
+            this.ControlType = ControlType;
+        }
+
         public string Header = "无标题";
+        public string Description = "";
         public bool UseConnector = true;
         public Color PointerColor = Colors.Black;
         public PointerControlType ControlType = PointerControlType.PAny;

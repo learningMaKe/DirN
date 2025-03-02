@@ -37,7 +37,7 @@ namespace DirN.Utils.Nodes.Maps
                     continue;
                 }
                 HDesAttribute des = type.GetCustomAttribute<HDesAttribute>() ?? new(ht.ToString());
-                HandlerConfig? hc = CC(type, des.Header);
+                HandlerConfig? hc = CC(type, des.Header,des.Description);
                 if(hc == null)
                 {
                     Debug.WriteLine("未找到配置：" + typeName);

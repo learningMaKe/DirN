@@ -29,6 +29,8 @@ namespace DirN.ViewModels.Node
 
         public bool IsInput => PointerParent.IsInput;
 
+        public abstract IList<INode> LinkedNodes { get; }
+
         public Connector Connector
         {
             get

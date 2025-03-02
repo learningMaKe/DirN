@@ -17,6 +17,14 @@ namespace DirN.ViewModels.Node
     {
         protected ObservableCollection<ICurve> CurveGroup = [];
 
+        public override IList<INode> LinkedNodes 
+        {
+            get
+            {
+               return [..CurveGroup.Where(x=>x.EndPointOwner!= null).Select(c => c.EndPointOwner!.PointerParent.NodeParent)] ;
+            }
+        } 
+
         public OutputConnectorViewModel(PointerViewModel parent) : base(parent)
         {
 

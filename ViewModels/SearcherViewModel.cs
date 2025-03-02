@@ -79,7 +79,7 @@ namespace DirN.ViewModels
 
         private void SetDirectory(string directory)
         {
-            DirectoryManager.Directory = directory;
+            DirectoryManager.WorkDirectory = directory;
             PreviewerManager.PreviewerVisibility = true;
         }
 
@@ -90,7 +90,7 @@ namespace DirN.ViewModels
 
         private void Loaded()
         {
-            StartLocation = DirectoryManager.Directory;
+            StartLocation = DirectoryManager.WorkDirectory;
         }
 
     }

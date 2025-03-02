@@ -23,6 +23,8 @@ namespace DirN.ViewModels.Node
 
         public bool IsInput { get; }
 
+        public IList<INode> LinkedNodes { get; }
+
         public void RemoveLink(ICurve curve);
 
         public void AddLink(ICurve curve);
@@ -38,6 +40,5 @@ namespace DirN.ViewModels.Node
 
     public interface IOutputConnector : IConnector
     {
-
     }
 }

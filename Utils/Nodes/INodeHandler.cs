@@ -18,6 +18,10 @@ namespace DirN.Utils.Nodes
 
         public string Header { get; set; }
 
+        public string Description { get; set; }
+
+        public IList<INode> Next { get; }
+
         public Color MainColor { get; set; }
 
         public Brush HeaderBrush { get; }

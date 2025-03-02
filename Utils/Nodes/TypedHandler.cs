@@ -18,13 +18,20 @@ namespace DirN.Utils.Nodes
     {
         public INode? Parent { get; init; }
 
-        public abstract Type[] InputTypes { get; }
-        public abstract Type[] OutputTypes { get; }
+        private Dictionary<string, IPointer> InputDict { get; set; } = [];
+        private Dictionary<string, IPointer> OutputDict { get; set; } = [];
+
+        protected abstract Type[] InputTypes { get; }
+        protected abstract Type[] OutputTypes { get; }
 
         public ObservableCollection<IPointer> InputGroup { get; set; } = [];
         public ObservableCollection<IPointer> OutputGroup { get; set; } = [];
+        
+        public IList<INode> Next=> [.. OutputGroup.SelectMany(x=>x.Connector.LinkedNodes).Distinct()];
 
         public string Header { get; set; } = "Undefined";
+
+        public string Description { get; set; } = "Undefined";
 
         [OnChangedMethod(nameof(OnMainColorChanged))]
         public Color MainColor { get; set; } = Colors.Black;
@@ -33,15 +40,23 @@ namespace DirN.Utils.Nodes
 
         public Color HeaderEffectColor { get;private set; } = Colors.Black;
 
-        public virtual void Init(INode parent) 
+        public void Init(INode parent) 
         {
+            InputDict = HandlerBulider.Pointer<InputerViewModel>(parent, InputTypes);
+            OutputDict = HandlerBulider.Pointer<OutputerViewModel>(parent, OutputTypes);
+            
+            InputGroup = [.. InputDict.Values];
+            OutputGroup = [.. OutputDict.Values];
+
             Type type = GetType();
             HDesAttribute? hdes=type.GetCustomAttributes(typeof(HDesAttribute), true).FirstOrDefault() as HDesAttribute;
             if (hdes is not null)
             {
                 Header = hdes.Header;
+                Description = hdes.Description;
                 MainColor = hdes.MainColor;
             }
+            ExtraInit();
         }
 
         public void DataFlow()
@@ -68,6 +83,54 @@ namespace DirN.Utils.Nodes
             object?[] input = [.. InputGroup.Select(x => x.Data)];
             IList<object?>? output = Handle(input);
             return output;
+        }
+
+        protected virtual void ExtraInit() { }
+
+        protected bool TryGetInputConfig<T>(out PointerConfig? config, int index = 0)
+        {
+            Type type = typeof(T);
+            config = null;
+            string key = type.Name + index;
+            if (InputDict.TryGetValue(key, out IPointer? value))
+            {
+                config = value.PointerConfig;
+            }
+            return config is not null;
+        }
+
+        protected bool TryGetOutputConfig<T>(out PointerConfig? config, int index = 0)
+        {
+            Type type = typeof(T);
+            config = null;
+            string key = type.Name + index;
+            if (OutputDict.TryGetValue(key, out IPointer? value))
+            {
+                config = value.PointerConfig;
+            }
+            return config is not null;
+        }
+
+        protected bool TryGetConfig<T>(bool isInput, out PointerConfig? config, int index = 0)
+        {
+            Type type = typeof(T);
+            config = null;
+            string key = type.Name + index;
+            if (isInput)
+            {
+                if (InputDict.TryGetValue(key, out IPointer? value))
+                {
+                    config = value.PointerConfig;
+                }
+            }
+            else
+            {
+                if (OutputDict.TryGetValue(key, out IPointer? value))
+                {
+                    config = value.PointerConfig;
+                }
+            }
+            return config is not null;
         }
 
         protected abstract IList<object?> Handle(IList<object?> input);

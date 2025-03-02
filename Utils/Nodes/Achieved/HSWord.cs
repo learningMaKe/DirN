@@ -11,9 +11,9 @@ namespace DirN.Utils.Nodes.Achieved
     [HDes("保留字")]
     public class HSWord : TypedHandler
     {
-        public override Type[] InputTypes => [];
+        protected override Type[] InputTypes => [];
 
-        public override Type[] OutputTypes => [typeof(string)];
+        protected override Type[] OutputTypes => [typeof(string)];
 
         protected override IList<object?> Handle(IList<object?> input)
         {

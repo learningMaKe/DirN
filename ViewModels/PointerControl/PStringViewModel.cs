@@ -13,7 +13,6 @@ namespace DirN.ViewModels.PointerControl
     public class PStringViewModel:PViewModel
     {
         public StoredWord SelectedWord { get; set; } = new();
-        public string DisplayText { get; set; } = "保留字";
 
         public ObservableCollection<StoredWord> StoredWords { get; set; }
 

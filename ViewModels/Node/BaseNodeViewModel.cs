@@ -22,6 +22,18 @@ namespace DirN.ViewModels.Node
 
         public int ZIndex { get; set; }
 
+        public IList<INode> Next
+        {
+            get
+            {
+                if(Handler == null)
+                {
+                    return [];
+                }
+                return Handler.Next;
+            }
+        }
+
         public DelegateCommand<DragDeltaEventArgs> DragDeltaCommand { get; private set; }
         public DelegateCommand<DragCompletedEventArgs> DragCompletedCommand { get; private set; }
         public DelegateCommand<DragStartedEventArgs> DragStartedCommand { get; private set; }
@@ -142,7 +154,7 @@ namespace DirN.ViewModels.Node
 
         private void Loaded()
         {
-            OnHandlerTypeChanged();
+
         }
 
         private void OnHandlerTypeChanged()
@@ -155,7 +167,9 @@ namespace DirN.ViewModels.Node
 
         private void OnDebug()
         {
-            DebugManager.Instance.DrawRect(GetRect().ScaleTransform(NodeGraphicsManager.GetCentralPoint(), NodeGraphicsManager.NodeScale));
+            //DebugManager.Instance.DrawRect(GetRect().ScaleTransform(NodeGraphicsManager.GetCentralPoint(), NodeGraphicsManager.NodeScale));
+            string strs = string.Join("\n", Handler!.InputGroup.Select(i => i.PointerConfig!.Header + " " + i.PointerConfig!.GetHashCode().ToString()));
+            MessageBox.Show(strs);
         }
 
         private void OnTestOutput()

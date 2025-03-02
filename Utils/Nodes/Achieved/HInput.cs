@@ -11,21 +11,20 @@ using System.Threading.Tasks;
 namespace DirN.Utils.Nodes.Achieved
 {
     [HDes("输入")]
-    public class HInput : TypedHandler
+    public class HInput : OutputHandler<string>
     {
-        public override Type[] InputTypes => [];
-
-        public override Type[] OutputTypes => [typeof(string)];
-
-        public override void Init(INode parent)
+        protected override void ExtraInit()
         {
-            base.Init(parent);
-            Header = "输入";
+            if(TryGetOutputConfig<string>(out PointerConfig? config))
+            {
+                config!.Header = "目录";
+                config!.Description = "就目录栏那个";
+            }
         }
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override string Output()
         {
-            return [DirectoryManager.Instance.Directory];
+            return DirectoryManager.Instance.WorkDirectory;
         }
     }
 }

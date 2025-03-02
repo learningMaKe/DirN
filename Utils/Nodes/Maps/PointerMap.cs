@@ -37,6 +37,13 @@ namespace DirN.Utils.Nodes.Maps
                 PointerColor = Colors.Red,
                 ControlType = PointerControlType.PInt,
             }).
+            Set(typeof(bool),new PointerConfig()
+            {
+                Header = "布尔值",
+                UseConnector = false,
+                PointerColor = Colors.Purple,
+                ControlType = PointerControlType.PBool,
+            }).
 
             Set(typeof(FileInfo), new PointerConfig()
             {
@@ -62,11 +69,12 @@ namespace DirN.Utils.Nodes.Maps
             Assembly assembly = Assembly.GetExecutingAssembly();
             foreach (Type type in assembly.GetTypes())
             {
-                HPCDesAttribute? attribute = type.GetCustomAttribute<HPCDesAttribute>();
+                HPDesAttribute? attribute = type.GetCustomAttribute<HPDesAttribute>();
                 if (attribute == null) continue;
                 source.Set(type, new PointerConfig()
                 {
                     Header = attribute.Header,
+                    Description = attribute.Description,
                     PointerColor = attribute.PointerColor,
                     ControlType = attribute.ControlType,
                     UseConnector = attribute.UseConnector,

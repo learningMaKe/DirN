@@ -28,6 +28,9 @@
     <i:EventTrigger EventName="MouseLeftButtonUp">
       <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>
+    <i:EventTrigger EventName="MouseWheel">
+      <i:InvokeCommandAction Command="{Binding MouseWheelCommand}" PassEventArgsToCommand="True" />
+    </i:EventTrigger>
   </i:Interaction.Triggers>
   <Grid x:Name="MainCanvas" Background="Transparent">
     <Grid.ContextMenu>

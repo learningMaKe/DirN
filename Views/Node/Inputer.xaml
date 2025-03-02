@@ -20,10 +20,11 @@
   </i:Interaction.Triggers>
   <Grid>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="10" />
       <ColumnDefinition />
+      <ColumnDefinition Width="10" />
     </Grid.ColumnDefinitions>
-    <Grid Width="10" Visibility="{Binding UseConnector, Converter={StaticResource BooleanToVisibilityConverter}}">
+    <Grid Visibility="{Binding UseConnector, Converter={StaticResource BooleanToVisibilityConverter}}">
       <local:Connector DataContext="{Binding InputConnector}" />
     </Grid>
     <Grid
@@ -31,13 +32,18 @@
       Margin="3,0"
       HorizontalAlignment="Left"
       VerticalAlignment="Center">
-      <Grid Visibility="{Binding AcceptExternal, Converter={StaticResource InverseBoolenConvetToVisibility}}">
-        <pc:PContainer DataContext="{Binding PointerContainer}" />
-      </Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="70" />
+        <ColumnDefinition />
+      </Grid.ColumnDefinitions>
       <TextBlock
+        Margin="3,0"
         VerticalAlignment="Center"
         Text="{Binding PointerConfig.Header}"
-        Visibility="{Binding AcceptExternal, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        ToolTip="{Binding PointerConfig.Description}" />
+      <Grid Grid.Column="1" Visibility="{Binding AcceptExternal, Converter={StaticResource InverseBoolenConvetToVisibility}}">
+        <pc:PContainer DataContext="{Binding PointerContainer}" />
+      </Grid>
     </Grid>
   </Grid>
 </UserControl>

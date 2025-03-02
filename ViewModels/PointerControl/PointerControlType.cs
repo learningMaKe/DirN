@@ -13,6 +13,7 @@ namespace DirN.ViewModels.PointerControl
         PInt,
         PAny,
         PFileInfo,
-        PFilterSelection,
+        PEnum,
+        PBool,
     }
 }

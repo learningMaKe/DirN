@@ -17,7 +17,7 @@ namespace DirN.Utils.Nodes
     {
         public string Header { get; set; } = "Pointer";
 
-        public string Description { get; set; } = "Configure the pointer";
+        public string Description { get; set; } = "啥也没写";
 
         public bool UseConnector { get; set; } = true;
 

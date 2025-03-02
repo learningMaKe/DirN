@@ -24,6 +24,8 @@
     </Style>
     <node:NodeAlignment x:Key="NodeAlignmentLeft">Left</node:NodeAlignment>
     <node:NodeAlignment x:Key="NodeAlignmentTop">Top</node:NodeAlignment>
+    <system:Double x:Key="PointerHeight">25</system:Double>
+    <Thickness x:Key="PointerMargin">3</Thickness>
   </UserControl.Resources>
   <i:Interaction.Triggers>
     <i:EventTrigger EventName="Loaded">
@@ -51,7 +53,8 @@
       <ui:CardExpander
         MinWidth="160"
         Padding="4"
-        Background="{Binding Handler.HeaderBrush}">
+        Background="{Binding Handler.HeaderBrush}"
+        ContentPadding="2,16">
         <ui:CardExpander.Header>
           <Grid>
             <Grid.ContextMenu>
@@ -73,7 +76,7 @@
                 </MenuItem>
               </ContextMenu>
             </Grid.ContextMenu>
-            <TextBlock Text="{Binding Handler.Header}" />
+            <TextBlock Text="{Binding Handler.Header}" ToolTip="{Binding Handler.Description}" />
           </Grid>
         </ui:CardExpander.Header>
 
@@ -88,14 +91,20 @@
               <ItemsControl ItemsSource="{Binding Handler.OutputGroup}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate DataType="{x:Type node:OutputerViewModel}">
-                    <local:Outputer Margin="3" DataContext="{Binding}" />
+                    <local:Outputer
+                      Height="{StaticResource PointerHeight}"
+                      Margin="{StaticResource PointerMargin}"
+                      DataContext="{Binding}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
               <ItemsControl ItemsSource="{Binding Handler.InputGroup}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate DataType="{x:Type node:InputerViewModel}">
-                    <local:Inputer Margin="3" DataContext="{Binding}" />
+                    <local:Inputer
+                      Height="{StaticResource PointerHeight}"
+                      Margin="{StaticResource PointerMargin}"
+                      DataContext="{Binding}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>

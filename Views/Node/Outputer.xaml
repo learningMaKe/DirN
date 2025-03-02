@@ -19,13 +19,17 @@
   </i:Interaction.Triggers>
   <Grid HorizontalAlignment="Right">
     <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="10" />
       <ColumnDefinition Width="*" />
-      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="10" />
     </Grid.ColumnDefinitions>
-    <Grid Margin="3,0">
-      <TextBlock Text="{Binding PointerConfig.Header}" />
+    <Grid Grid.Column="1" Margin="3,0">
+      <TextBlock
+        VerticalAlignment="Center"
+        Text="{Binding PointerConfig.Header}"
+        ToolTip="{Binding PointerConfig.Description}" />
     </Grid>
-    <Grid Grid.Column="1" Width="10">
+    <Grid Grid.Column="2" Width="10">
       <local:Connector x:Name="Inputer" DataContext="{Binding OutputConnector}" />
     </Grid>
   </Grid>

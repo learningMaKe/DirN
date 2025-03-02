@@ -34,5 +34,9 @@ namespace DirN.Utils.NgManager
         public void Remove(StoredWord word);
 
         public void Execute();
+
+        public void ZoomIn();
+
+        public void ZoomOut();
     }
 }

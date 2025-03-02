@@ -1,5 +1,4 @@
 ﻿using DirN.Utils.Nodes;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +16,8 @@ namespace DirN.ViewModels.Node
         public HandlerType HandlerType { get;set; }
 
         public INodeHandler? Handler { get; }
+
+        public IList<INode> Next { get; }
 
         public void Move(Vector delta);
 

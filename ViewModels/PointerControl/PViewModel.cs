@@ -13,11 +13,13 @@ namespace DirN.ViewModels.PointerControl
     {
         public IPContainer? Parent { get; set; }
         public IPointer? PointerParent { get; set; }
+        public PointerConfig? Config { get; set; }
 
         public void Init(IPContainer parent) 
         {
             Parent = parent;
             PointerParent = parent.PointerParent;
+            Config = PointerParent.PointerConfig;
             Init();
         }
 
@@ -32,7 +34,7 @@ namespace DirN.ViewModels.PointerControl
             set => SetData(value);
         }
 
-        public virtual object? GetData() { return null; }
+        public abstract object? GetData();
 
         public virtual void SetData(object? data) { }
     }

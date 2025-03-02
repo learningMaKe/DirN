@@ -9,16 +9,15 @@ using System.Windows;
 
 namespace DirN.Utils.Nodes.Achieved
 {
-    [HDes("调试")]
+    [HDes("调试","#F060","调试节点")]
     public class HDebug : TypedHandler
     {
-        public override Type[] InputTypes => [typeof(object)];
+        protected override Type[] InputTypes => [typeof(object)];
 
-        public override Type[] OutputTypes => [];
+        protected override Type[] OutputTypes => [];
 
-        public override void Init(INode parent)
+        protected override void ExtraInit()
         {
-            base.Init(parent);
             Header = "调试节点";
         }
 

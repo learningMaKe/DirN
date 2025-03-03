@@ -1,12 +1,13 @@
 ﻿
 
+using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using System.Windows;
 using System.Windows.Media;
 
 namespace DirN.Utils.NgManager.Curves
 {
-    public interface ICurve:INodeData
+    public interface ICurve:INodeData,ITooltipable
     {
         public Point StartPoint { get; set; }
         public Point EndPoint { get; set; }

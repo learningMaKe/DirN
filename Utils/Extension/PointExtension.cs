@@ -26,5 +26,17 @@ namespace DirN.Utils.Extension
             }
             return point.ScaleTransform(NodeGraphicsManager.Instance.CentralPoint,scale);
         }
+
+        public static Point Avg(this Point p1, params Point[] points)
+        {
+            double x = p1.X;
+            double y = p1.Y;
+            foreach (Point p in points)
+            {
+                x += p.X;
+                y += p.Y;
+            }
+            return new Point(x / (points.Length + 1), y / (points.Length + 1));
+        }
     }
 }

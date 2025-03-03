@@ -2,6 +2,7 @@
 using DirN.Utils.Extension;
 using DirN.Utils.NgManager;
 using DirN.Utils.Nodes;
+using DirN.Utils.Tooltips;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -19,6 +20,8 @@ namespace DirN.ViewModels.Node
 
         [OnChangedMethod(nameof(OnPositionChanged))]
         public Point Position { get; set; }
+
+        public Point RaisePosition { get;private set; }
 
         public int ZIndex { get; set; }
 
@@ -128,6 +131,10 @@ namespace DirN.ViewModels.Node
         private void OnPositionChanged()
         {
             UpdateLink();
+            if (GetView != null) 
+            {
+                RaisePosition = Point.Add(Position, new Vector(View.ActualWidth / 2, TooltipParameter.UpOffset));
+            }
         }
 
         private void DragDelta(DragDeltaEventArgs e)

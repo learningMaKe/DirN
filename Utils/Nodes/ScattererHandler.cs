@@ -14,7 +14,7 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             if (input.FirstOrDefault() is not TInput inputValue)
             {

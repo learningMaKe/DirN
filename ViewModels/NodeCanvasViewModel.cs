@@ -6,6 +6,7 @@ using DirN.Utils.KManager.HKey;
 using DirN.Utils.NgManager;
 using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
+using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using PropertyChanged;
 using System;
@@ -55,6 +56,7 @@ namespace DirN.ViewModels
 
 
         public INodeGraphicsManager NodeGraphicsManager { get;set; }
+        public TooltipManager TooltipManager { get; set; }
 
         public DelegateCommand<MouseEventArgs> MouseMoveCommand { get; set; }
         public DelegateCommand<MouseButtonEventArgs> MouseLeftButtonUpCommand { get; set; }
@@ -73,6 +75,7 @@ namespace DirN.ViewModels
         public NodeCanvasViewModel(IContainerProvider provider) : base(provider)
         {
             NodeGraphicsManager = provider.Resolve<INodeGraphicsManager>();
+            TooltipManager = provider.Resolve<TooltipManager>();
 
             MouseMoveCommand = new(MouseMove);
             MouseLeftButtonUpCommand = new(MouseLeftButtonUp);
@@ -115,7 +118,6 @@ namespace DirN.ViewModels
             SelectionZIndex = 0;
             Rect rect = new(LeftTopPoint, SelectionSize);
             NodeGraphicsManager.MultiSelectNodes(rect);
-
         }
 
         private void SelectionMove(MouseEventArgs e)
@@ -180,7 +182,6 @@ namespace DirN.ViewModels
             if (FocusedLink is not null)
             {
                 Point pt = e.GetPosition(Canvas);
-                Debug.WriteLine(pt);
                 PointHitTestParameters parameters = new(pt);
                 VisualTreeHelper.HitTest(Canvas, FocusedLink.FilterCallback, FocusedLink.ResultCallback, parameters);
                 if(FocusedLink.Curve!.EndPointOwner is null)

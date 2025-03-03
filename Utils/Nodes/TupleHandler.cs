@@ -18,7 +18,7 @@ namespace DirN.Utils.Nodes
         protected override Type[] InputTypes => typeof(TInput).GetGenericArguments();
         protected override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             TInput inputTuple = GenericBuilder.MakeTuple<TInput>([.. input]) ?? throw new ArgumentException("Input is not of type TInput");
             TOutput outputTuple = HandleTuple(inputTuple);

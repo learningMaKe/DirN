@@ -33,7 +33,7 @@ namespace DirN.Utils.Nodes
         /// <summary>
         /// 数据经由该节点流向下一个节点
         /// </summary>
-        public void DataFlow();
+        public bool DataFlow();
 
         public ObservableCollection<IPointer> InputGroup { get; set; }
         public ObservableCollection<IPointer> OutputGroup { get; set; }

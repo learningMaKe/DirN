@@ -5,6 +5,7 @@ using DirN.Utils.DirManager;
 using DirN.Utils.KManager;
 using DirN.Utils.NgManager;
 using DirN.Utils.PreManager;
+using DirN.Utils.Tooltips;
 using DirN.Views;
 using Fclp;
 using Fclp.Internals;
@@ -47,7 +48,7 @@ public partial class App
         containerRegistry.RegisterSingleton<KeyManager>();
         containerRegistry.RegisterSingleton<DirectoryManager>();
         containerRegistry.RegisterSingleton<PreviewerManager>();
-
+        containerRegistry.RegisterSingleton<TooltipManager>();
         containerRegistry.RegisterSingleton<INodeGraphicsManager, NodeGraphicsManager>();
 
     }

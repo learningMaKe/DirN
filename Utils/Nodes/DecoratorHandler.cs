@@ -12,7 +12,7 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => [typeof(TOutput)];
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             if (input.Count != 1)
             {

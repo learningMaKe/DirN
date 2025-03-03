@@ -46,6 +46,10 @@
       Orientation="Horizontal">
       <Button
         Margin="5,0"
+        Command="{Binding TestCommand}"
+        Content="{ui:SymbolIcon Symbol=Bug24}" />
+      <Button
+        Margin="5,0"
         Command="{Binding ExecuteCommand}"
         Content="{ui:SymbolIcon Symbol=Play20}" />
 

@@ -14,7 +14,7 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => [typeof(TOutput)];
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             TInput inputTuple = GenericBuilder.MakeTuple<TInput>([.. input]) ?? throw new ArgumentException("Input is not of type TInput");
             TOutput output = Aggregate(inputTuple);

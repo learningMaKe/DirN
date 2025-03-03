@@ -12,7 +12,7 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => [];
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             TInput? inputValue = (TInput?)input[0] ?? throw new ArgumentException("Input value is null");
             Input(inputValue);

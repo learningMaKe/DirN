@@ -7,4 +7,6 @@
   <converters:BoolenHorizontalConverter x:Key="BoolenHorizontalConverter" />
   <converters:Divide2Converter x:Key="Divide2Converter" />
   <converters:BoolenToWhiteConverter x:Key="BoolenToWhiteConverter" />
+  <converters:InverseDivide2Converter x:Key="InverseDivide2Converter" />
+  <converters:InverseConverter x:Key="InverseConverter" />
 </ResourceDictionary>

@@ -75,6 +75,7 @@
         BorderBrush="AliceBlue"
         Visibility="{Binding SelectionShow, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Canvas>
+
     <Grid
       x:Name="CanvasContainer"
       HorizontalAlignment="Stretch"
@@ -147,6 +148,36 @@
         </ItemsControl.ItemTemplate>
 
       </ItemsControl>
+
+      <!--  Tooltip Canvas  -->
+      <ItemsControl IsHitTestVisible="False" ItemsSource="{Binding TooltipManager.Tooltipers}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemContainerStyle>
+          <Style TargetType="{x:Type ContentPresenter}">
+            <Setter Property="Canvas.Left" Value="{Binding Tooltipable.RaisePosition.X}" />
+            <Setter Property="Canvas.Top" Value="{Binding Tooltipable.RaisePosition.Y}" />
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <ui:Card x:Name="TooltipCard" Padding="2">
+              <ui:Card.RenderTransform>
+                <TranslateTransform X="{Binding ElementName=TooltipCard, Path=ActualWidth, Converter={StaticResource InverseDivide2Converter}}" Y="{Binding ElementName=TooltipCard, Path=ActualHeight, Converter={StaticResource InverseConverter}}" />
+              </ui:Card.RenderTransform>
+              <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="{Binding Colorer.MainBrush}"
+                Text="{Binding ToolTipText}" />
+            </ui:Card>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
     </Grid>
 
     <Canvas x:Name="DecorateCanvas" />

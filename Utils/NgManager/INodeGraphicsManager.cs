@@ -23,6 +23,8 @@ namespace DirN.Utils.NgManager
 
         public ObservableCollection<ICurve> BezierCurves { get; }
 
+        public bool HaveLoopEdge();
+
         public void MoveNode(Vector delta, bool onlySelected = false);
 
         public void MultiSelectNodes(Rect rect);

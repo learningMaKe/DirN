@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Nodes;
+using DirN.Utils.Tooltips;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Windows;
 
 namespace DirN.ViewModels.Node
 {
-    public interface INode:INodePasser
+    public interface INode:INodePasser,ITooltipable
     {
         public bool IsSelected { get; set; }
 

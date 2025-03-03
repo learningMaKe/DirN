@@ -5,6 +5,7 @@ using DirN.Utils.KManager;
 using DirN.Utils.KManager.HKey;
 using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
+using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using DirN.Views;
 using PropertyChanged;
@@ -38,6 +39,7 @@ namespace DirN.Utils.NgManager
         public static readonly string DefaultText = "undefined";
 
         #region Properties
+
         public double NodeScale { get; set; } = 1;
 
         public Point CentralPoint
@@ -84,6 +86,34 @@ namespace DirN.Utils.NgManager
         }
 
         #region Public Methods
+
+        #region Execute Operations
+
+        public bool HaveLoopEdge()
+        {
+            // ToDo: Implement loop detection   
+            if (Nodes.Count == 0) return false;
+            HashSet<INode> visited = [];
+            Stack<INode> stack = new();
+            stack.Push(Nodes[0]);
+            return false;
+        }
+
+        public void Execute()
+        {
+            
+        }
+
+        #endregion
+
+
+        #region Node Operations
+
+        public void MakeLink(NodeGraphicsArgs.LinkArgs args)
+        {
+            eventAggregator.GetEvent<NodeGraphicsEvent.MakeLinkEvent>().Publish(args);
+        }
+
         public void MoveNode(Vector delta, bool onlySelected = false)
         {
             IList<INode> selectedNodes = onlySelected? Nodes.SelectedNodes : Nodes;
@@ -196,17 +226,6 @@ namespace DirN.Utils.NgManager
             }
         }
 
-        private void OnKeyEnter(KeyEventArgs e)
-        {
-            StoredWordVisiblity =!StoredWordVisiblity;
-        }
-
-        public void Execute()
-        {
-            //KeyManager.Instance.ChangeKey<KeyMap>(EventId.V_StoredWord, new(KeyState.Down, Key.V));
-            KeyManager.Instance.UserInit();
-        }
-
         public void AddNewNode(HandlerType? handlerType)
         {
             if (handlerType == null) return;
@@ -217,6 +236,9 @@ namespace DirN.Utils.NgManager
             });
         }
 
+        #endregion
+
+        #region Stored Word Operations
         public void AddNew()
         {
             StoredWords.Add(new StoredWord()
@@ -224,11 +246,6 @@ namespace DirN.Utils.NgManager
                 Word = DefaultText,
                 Index = StoredWords.Count
             });
-        }
-
-        public void MakeLink(NodeGraphicsArgs.LinkArgs args)
-        {
-            eventAggregator.GetEvent<NodeGraphicsEvent.MakeLinkEvent>().Publish(args);
         }
 
         public void Remove(StoredWord word)
@@ -242,6 +259,9 @@ namespace DirN.Utils.NgManager
             }
 
         }
+        #endregion
+        
+        #region Get Point
 
         public Point GetCentralPoint()
         {
@@ -267,6 +287,9 @@ namespace DirN.Utils.NgManager
             eventAggregator.GetEvent<NodeGraphicsEvent.MousePositionEvent>().Publish(args);
             return args.MousePosition;
         }
+        #endregion
+
+        #region Zoom
 
         public void ZoomIn()
         {
@@ -277,6 +300,8 @@ namespace DirN.Utils.NgManager
         {
             NodeScale = Math.Max(MinNodeScale, NodeScale - NodeScaleStep);
         }
+
+        #endregion
 
         #endregion
 
@@ -312,6 +337,11 @@ namespace DirN.Utils.NgManager
 
         }
         #endregion
+
+        private void OnKeyEnter(KeyEventArgs e)
+        {
+            StoredWordVisiblity = !StoredWordVisiblity;
+        }
 
         private void OnStoredWordVisiblityChanged()
         {

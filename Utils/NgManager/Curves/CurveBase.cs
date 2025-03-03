@@ -1,5 +1,7 @@
 ﻿using DirN.Utils.Events.EventType;
+using DirN.Utils.Extension;
 using DirN.Utils.Nodes;
+using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using PropertyChanged;
 using System;
@@ -18,11 +20,17 @@ namespace DirN.Utils.NgManager.Curves
     {
         private object? data;
 
-        [OnChangedMethod(nameof(Recalculate))]
+        private Type? StarterType=>StartPointOwner?.PointerParent.PointerType;
+
+        private Type? EnderType => EndPointOwner?.PointerParent.PointerType;
+
+        [OnChangedMethod(nameof(OnPointChanged))]
         public Point StartPoint { get; set; }
 
-        [OnChangedMethod(nameof(Recalculate))]
+        [OnChangedMethod(nameof(OnPointChanged))]
         public Point EndPoint { get; set; }
+
+        public Point RaisePosition { get;private set; }
 
         public Point ControlPoint1 { get;protected set; }
 
@@ -58,11 +66,34 @@ namespace DirN.Utils.NgManager.Curves
             }
         }
 
+        public void MakeSureLinkFlow()
+        {
+            if (StartPointOwner is null || EndPointOwner is null) return;
+
+            if (!(StartPointOwner.IsInput ^ EndPointOwner.IsInput)) return;
+
+            if (StartPointOwner.IsInput)
+            {
+                (StartPointOwner, EndPointOwner) = (EndPointOwner, StartPointOwner);
+            }
+            Brush = new LinearGradientBrush(StartPointOwner.ConnectorColor, EndPointOwner.ConnectorColor, StartPoint, EndPoint)
+            {
+                MappingMode = BrushMappingMode.Absolute,
+            };
+        }
+
         public void Remove()
         {
             StartPointOwner?.RemoveLink(this);
             EndPointOwner?.RemoveLink(this);
+            TooltipManager.Instance.RemoveTooltip(this);
             NodeGraphicsManager.Instance.BezierCurves.Remove(this);
+        }
+
+        private void OnPointChanged()
+        {
+            Recalculate();
+            RaisePosition = Point.Add(StartPoint.Avg(EndPoint), new Vector(0, 3));
         }
 
         protected abstract void Recalculate();
@@ -109,6 +140,7 @@ namespace DirN.Utils.NgManager.Curves
             {
                 StartPoint = startPoint;
             }
+            CheckLinkConvertable();
         }
 
         private void OnEndPointOwnerSet()
@@ -117,6 +149,7 @@ namespace DirN.Utils.NgManager.Curves
             {
                 EndPoint = endPoint;
             }
+            CheckLinkConvertable();
         }
 
         private bool OnOwnerSet(IConnector? connector,out Point point)
@@ -127,21 +160,21 @@ namespace DirN.Utils.NgManager.Curves
             return true;
         }
 
-        public void MakeSureLinkFlow()
+        private void CheckLinkConvertable()
         {
-            if (StartPointOwner is null || EndPointOwner is null) return;
-
-            if (!(StartPointOwner.IsInput ^ EndPointOwner.IsInput)) return;
-
-            if (StartPointOwner.IsInput)
+            if(StartPointOwner is null || EndPointOwner is null)
             {
-                (StartPointOwner, EndPointOwner) = (EndPointOwner, StartPointOwner);
+                TooltipManager.Instance.RemoveTooltip(this);
+                return;
             }
-            Brush = new LinearGradientBrush(StartPointOwner.ConnectorColor, EndPointOwner.ConnectorColor, StartPoint, EndPoint)
+            Type startType = StartPointOwner.PointerParent.PointerType;
+            Type endType = EndPointOwner.PointerParent.PointerType;
+            if (!HandlerManager.CanConvertData(startType, endType))
             {
-                MappingMode = BrushMappingMode.Absolute,
-            };
+                TooltipManager.Instance.Tooltip(this, $"{startType.Name}->{endType.Name} 不能转换", TooltipType.Error);
+            }
         }
+
 
     }
 }

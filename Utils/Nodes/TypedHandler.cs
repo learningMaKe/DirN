@@ -1,6 +1,7 @@
 ﻿using DirN.Utils.Nodes.Attributes;
 using DirN.Utils.Nodes.Bulider;
 using DirN.Utils.Nodes.Exceptions;
+using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using PropertyChanged;
 using System;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace DirN.Utils.Nodes
@@ -59,29 +61,53 @@ namespace DirN.Utils.Nodes
             ExtraInit();
         }
 
-        public void DataFlow()
+        public bool DataFlow()
         {
             IList<object?>? output = GetOutput();
-            if (output is null) return;
-            SetOutput(output);
+            if (output is null) return false;
+            return SetOutput(output);
         }
 
-        public void SetOutput(IList<object?> output)
+        public bool SetOutput(IList<object?> output)
         {
-            if (output is null) return;
+            if (output is null) return false;
 
-            OutputCountNotMatchException.ThrowIf(Parent!, output.Count, OutputGroup.Count);
+            //OutputCountNotMatchException.ThrowIf(Parent!, output.Count, OutputGroup.Count);
+            if(output.Count != OutputGroup.Count)
+            {
+                return false;
+            }
 
             for (int i = 0; i < OutputGroup.Count; i++)
             {
                 OutputGroup[i].Data = output[i];
             }
+            return true;
         }
 
         public IList<object?>? GetOutput()
         {
-            object?[] input = [.. InputGroup.Select(x => x.Data)];
-            IList<object?>? output = Handle(input);
+            //object?[] input = [.. InputGroup.Select(x => x.Data)];
+            if (Parent is null) return null;
+            IList<object> datas = [];
+            bool isError = false;
+            string errorInfo = string.Empty;
+            foreach(var input in InputGroup)
+            {
+                if(input.Data is not null)
+                {
+                    datas.Add(input.Data);
+                    continue;
+                }
+                isError = true;
+                errorInfo += $"Input {input.PointerConfig!.Header} is null. \n";
+            }
+            if (isError)
+            {
+                TooltipManager.Instance.Tooltip(Parent, errorInfo, TooltipType.Error);
+                return null;
+            }
+            IList<object?>? output = Handle([.. datas]);
             return output;
         }
 
@@ -133,7 +159,7 @@ namespace DirN.Utils.Nodes
             return config is not null;
         }
 
-        protected abstract IList<object?> Handle(IList<object?> input);
+        protected abstract IList<object?> Handle(IList<object> input);
 
         private void OnMainColorChanged()
         {

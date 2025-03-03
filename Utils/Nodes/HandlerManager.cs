@@ -120,6 +120,19 @@ namespace DirN.Utils.Nodes
             return false;
         }
 
+        public static bool CanConvertData(Type inT, Type outT)
+        {
+            if (inT == outT)
+            {
+                return true;
+            }
+            if (dataConverters.ContainsKey((inT, outT)))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static bool ConvertData(Type inT ,Type outT, object? input, out object? output)
         {
             if (input is null)

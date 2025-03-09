@@ -8,6 +8,8 @@ using DirN.Utils.Nodes;
 using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using DirN.Views;
+using Fclp.Internals.Extensions;
+using Newtonsoft.Json;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
@@ -33,7 +35,8 @@ namespace DirN.Utils.NgManager
         private const double MinNodeScale = 0.3;
         private const double NodeScaleStep = 0.01;
 
-        private Point? centralPoint;
+        private static readonly Vector CopyOffset = new(10, 10);
+        private IList<(HandlerType,Point)> CopiedNode = [];
         #endregion
 
         public static readonly string DefaultText = "undefined";
@@ -42,30 +45,17 @@ namespace DirN.Utils.NgManager
 
         public double NodeScale { get; set; } = 1;
 
-        public Point CentralPoint
-        {
-            get
-            {
-                if (centralPoint == null)
-                {
-                    centralPoint = GetCentralPoint();
-                }
-                return centralPoint.Value;
-            }
-        }
+        public Point CentralPoint => GetCentralPoint();
 
         public ObservableCollection<MenuItemInfo> CanvasContextMenu { get; private set; } = [];
-
-        public NodeGroup Nodes { get; private set; } = [];
-
-        public ObservableCollection<StoredWord> StoredWords { get; private set; } = [];
-
-        public ObservableCollection<ICurve> BezierCurves { get; private set; } = [];
 
         [OnChangedMethod(nameof(OnStoredWordVisiblityChanged))]
         public bool StoredWordVisiblity { get; set; }
 
+        public NodeDetail NodeDetail { get; private set; } = new();
+
         public DelegateCommand<HandlerType?> AddNewNodeCommand { get; private set; }
+        
         #endregion
 
         public NodeGraphicsManager(IContainerProvider containerProvider):base(containerProvider)
@@ -78,8 +68,17 @@ namespace DirN.Utils.NgManager
             keyManager.RegisterEvent<KeyEventArgs>(EventId.V_StoredWord, OnKeyEnter);
             keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Focus, e => FocusNode());
 
-            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_SelectAll, e => Nodes.SelectAll());
-            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_DeleteSelected, e => Nodes.DeleteSelectedNodes());
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_SelectAll, e => NodeDetail.Nodes.SelectAll());
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_DeleteSelected, e => NodeDetail.Nodes.DeleteSelectedNodes());
+
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Align_Left, e => KeyAlign(e, NodeAlignment.Left));
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Align_Right, e => KeyAlign(e, NodeAlignment.Right));
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Align_Top, e => KeyAlign(e, NodeAlignment.Top));
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Align_Bottom, e => KeyAlign(e, NodeAlignment.Bottom));
+
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Copy, NodeCopy);
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Cut, NodeCut);
+            keyManager.RegisterEvent<KeyEventArgs>(EventId.Node_Paste, NodePaste);
 
             InitCanvasContextMenu();
             InitNodes();
@@ -87,25 +86,44 @@ namespace DirN.Utils.NgManager
 
         #region Public Methods
 
+        public void AddNode(INode node)
+        {
+            NodeDetail.Nodes.Add(node);
+        }
+
+        public void AddCurve(ICurve curve)
+        {
+            NodeDetail.BezierCurves.Add(curve);
+        }
+
+        public void RemoveNode(INode node)
+        {
+            NodeDetail.Nodes.Remove(node);
+        }
+
+        public void RemoveCurve(ICurve curve)
+        {
+            NodeDetail.BezierCurves.Remove(curve);
+        }
+
+        public void AddNode(HandlerType handlerType, Point position = default)
+        {
+            NodeDetail.Nodes.Add(NodeFactory.Create(handlerType, position));
+        }
+
         #region Execute Operations
 
-        public bool HaveLoopEdge()
+        public bool LoopDetect()
         {
-            // ToDo: Implement loop detection   
-            if (Nodes.Count == 0) return false;
-            HashSet<INode> visited = [];
-            Stack<INode> stack = new();
-            stack.Push(Nodes[0]);
-            return false;
+            return NodeDetail.LoopDetect();
         }
 
         public void Execute()
         {
-            
+            NodeDetail.Execute();
         }
 
         #endregion
-
 
         #region Node Operations
 
@@ -116,26 +134,14 @@ namespace DirN.Utils.NgManager
 
         public void MoveNode(Vector delta, bool onlySelected = false)
         {
-            IList<INode> selectedNodes = onlySelected? Nodes.SelectedNodes : Nodes;
-            foreach (var node in selectedNodes)
-            {
-                node.Move(delta);
-            }
-        }
-
-        public void UpdateLink()
-        {
-            foreach (var node in Nodes)
-            {
-                node.UpdateLink();
-            }
+            NodeDetail.MoveNode(delta, onlySelected);
         }
 
         public void MultiSelectNodes(Rect rect)
         {
             Point centralPoint = GetCentralPoint();
             IList<INode> selectedNodes = [];
-            foreach (var node in Nodes)
+            foreach (var node in NodeDetail.Nodes)
             {
                 Rect nodeRect = node.GetRect().ScaleTransform(centralPoint, NodeScale);
                 if (nodeRect.IntersectsWith(rect))
@@ -148,116 +154,43 @@ namespace DirN.Utils.NgManager
 
         public void SelectNode(params INode[] nodes)
         {
-
-            ModifierKeys modifiers = Keyboard.Modifiers;
-            Nodes.SelectNode(
-                modifiers ==ModifierKeys.None,
-                modifiers != ModifierKeys.Alt,
-                [.. nodes]);
+            NodeDetail.SelectNode(nodes);
         }
 
         public void FocusNode()
         {
-            Point[] points= [.. Nodes.Select(x => x.Position)];
-            double avgX = points.Sum(x => x.X) / points.Length;
-            double avgY = points.Sum(x => x.Y) / points.Length;
-            Point nodeCenter = new(avgX, avgY);
-            Point centralPoint = GetCentralPoint();
-            Vector delta = centralPoint - nodeCenter;
-            MoveNode(delta);
-            UpdateLink();
+            NodeDetail.Nodes.ToCentral(CentralPoint);
         }
 
         public void AlignNode(INode node, NodeAlignment alignment)
         {
-            IList<INode> SelectedNodes = Nodes.SelectedNodes;
-            if (SelectedNodes.Count == 0) return;
-            if (alignment == NodeAlignment.Left)
-            {
-                foreach (var selectedNode in SelectedNodes)
-                {
-                    selectedNode.Position = new(node.Position.X, selectedNode.Position.Y);
-                }
-            }
-            else if (alignment == NodeAlignment.Top)
-            {
-                foreach (var selectedNode in SelectedNodes)
-                {
-                    selectedNode.Position = new(selectedNode.Position.X, node.Position.Y);
-                }
-            }
+            NodeDetail.AlignNode(node, alignment);
         }
 
         public void AlignNodes(NodeAlignment alignment)
         {
-            IList<INode> SelectedNodes = Nodes.SelectedNodes;
-            if (SelectedNodes.Count == 0) return;
-            if(alignment == NodeAlignment.Left)
-            {
-                double minX = SelectedNodes.Min(x => x.Position.X);
-                foreach (var node in SelectedNodes)
-                {
-                    node.Position = new(minX, node.Position.Y);
-                }
-            }
-            else if(alignment == NodeAlignment.Right)
-            {
-                double maxX = SelectedNodes.Max(x => x.Position.X);
-                foreach (var node in SelectedNodes)
-                {
-                    node.Position = new(maxX, node.Position.Y);
-                }
-            }
-            else if(alignment == NodeAlignment.Top)
-            {
-                double minY = SelectedNodes.Min(x => x.Position.Y);
-                foreach (var node in SelectedNodes)
-                {
-                    node.Position = new(node.Position.X, minY);
-                }
-            }
-            else if(alignment == NodeAlignment.Bottom)
-            {
-                double maxY = SelectedNodes.Max(x => x.Position.Y);
-                foreach (var node in SelectedNodes)
-                {
-                    node.Position = new(node.Position.X, maxY);
-                }
-            }
+            NodeDetail.AlignNodes(alignment);
         }
 
-        public void AddNewNode(HandlerType? handlerType)
+
+        public void SaveNode()
         {
-            if (handlerType == null) return;
-            Nodes.Add(new BaseNodeViewModel(this)
-            {
-                Position = GetCanvasMousePosition(),
-                HandlerType = handlerType.Value,
-            });
+            string str = JsonConvert.SerializeObject(NodeDetail, Formatting.Indented);
+            Debug.WriteLine(str);
+            NodeDetail? detail = JsonConvert.DeserializeObject<NodeDetail>(str);
         }
 
         #endregion
 
         #region Stored Word Operations
-        public void AddNew()
+        public void AddSWord()
         {
-            StoredWords.Add(new StoredWord()
-            {
-                Word = DefaultText,
-                Index = StoredWords.Count
-            });
+            NodeDetail.AddSWord();
         }
 
-        public void Remove(StoredWord word)
+        public void RemoveSWord(SWord word)
         {
-            int index = StoredWords.IndexOf(word);
-            if (index == -1) return;
-            StoredWords.Remove(word);
-            for (int i = index; i < StoredWords.Count; i++)
-            {
-                StoredWords[i].Index = i;
-            }
-
+            NodeDetail.RemoveSWord(word);
         }
         #endregion
         
@@ -338,6 +271,44 @@ namespace DirN.Utils.NgManager
         }
         #endregion
 
+        private void AddNewNode(HandlerType? handlerType)
+        {
+            if (handlerType is null) return;
+            AddNode(handlerType.Value, GetCanvasMousePosition());
+        }
+
+        private void NodePaste(KeyEventArgs args)
+        {
+            IList<INode> nodes = [];
+            foreach(var (handlerType,position) in CopiedNode)
+            {
+                nodes.Add(NodeFactory.Create(handlerType, position));
+            }
+            foreach(var node in nodes)
+            {
+                node.Position += CopyOffset;
+            }
+            NodeDetail.Nodes.AddRange(nodes);
+            NodeDetail.Nodes.SelectNode(true, true, [.. nodes]);
+        }
+
+        private void NodeCut(KeyEventArgs args)
+        {
+            NodeCopy(args);
+            NodeDetail.Nodes.DeleteSelectedNodes();
+        }
+
+        private void NodeCopy(KeyEventArgs args)
+        {
+            CopiedNode = [.. NodeDetail.Nodes.SelectedNodes.Select(x => (x.HandlerType,x.Position))];
+        }
+
+        private void KeyAlign(KeyEventArgs args,NodeAlignment alignment)
+        {
+            args.Handled = true;
+            AlignNodes(alignment);
+        }
+
         private void OnKeyEnter(KeyEventArgs e)
         {
             StoredWordVisiblity = !StoredWordVisiblity;
@@ -347,17 +318,6 @@ namespace DirN.Utils.NgManager
         {
             eventAggregator.GetEvent<NodeGraphicsEvent.StoredWordVisibilityEvent>().Publish(StoredWordVisiblity);
         }
-
-        private void NodeEnlarge(MouseWheelEventArgs args)
-        {
-            NodeScale = Math.Min(MaxNodeScale, NodeScale + NodeScaleStep);
-        }
-
-        private void NodeShrink(MouseWheelEventArgs args)
-        {
-            NodeScale = Math.Max(MinNodeScale, NodeScale - NodeScaleStep);
-        }
-
 
         #endregion
     }

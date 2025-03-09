@@ -11,6 +11,7 @@ using DirN.Utils.Events.EventType;
 using DirN.Utils.PreManager;
 using DirN.Utils.NgManager;
 using System.Windows;
+using DirN.Utils.Tooltips;
 
 namespace DirN.ViewModels
 {
@@ -40,7 +41,6 @@ namespace DirN.ViewModels
             LoadedCommand = new(Loaded);
             ExecuteCommand= new(Execute);
             EventAggregator.GetEvent<DirectoryManagerEvent.DirectoryChangedEvent>().Subscribe(OnDirectoryChanged);
-
         }
 
         private void Execute()
@@ -51,7 +51,7 @@ namespace DirN.ViewModels
 
         private void Test()
         {
-
+            NodeGraphicsManager.SaveNode();
         }
 
         private void Browse()

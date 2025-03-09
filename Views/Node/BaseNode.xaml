@@ -54,7 +54,8 @@
         MinWidth="160"
         Padding="4"
         Background="{Binding Handler.HeaderBrush}"
-        ContentPadding="2,16">
+        ContentPadding="2,16"
+        IsExpanded="{Binding IsExpanded}">
         <ui:CardExpander.Header>
           <Grid>
             <Grid.ContextMenu>

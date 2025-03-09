@@ -52,6 +52,21 @@ namespace DirN.Utils.Tooltips
             base.Remove(tooltiper);
         }
 
+        public new void RemoveAt(int index)
+        {
+            Tooltiper tooltiper = this[index];
+            tooltips.Remove(tooltiper.Tooltipable);
+            base.RemoveAt(index);
+        }
+
+        public new void Clear()
+        {
+            while (Count > 0)
+            {
+                RemoveAt(0);
+            }
+        }
+
         public void Remove(ITooltipable tooltipable)
         {
             if (tooltips.TryGetValue(tooltipable, out Tooltiper? value))

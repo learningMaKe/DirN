@@ -1,18 +1,30 @@
-﻿using Fclp.Internals.Extensions;
+﻿using DirN.Utils.Tooltips;
+using Fclp.Internals.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Xml.Linq;
 
 namespace DirN.ViewModels.Node
 {
-    public class NodeGroup:ObservableCollection<INode>
+    public class NodeGroup:ObservableCollection<INode>,INodePasser
     {
+
         public IList<INode> SelectedNodes=> [.. this.Where(n => n.IsSelected)];
 
-        public void SelectNode(bool clearCurrentSelections, bool isSelected, params INode[] nodes)
+        public Point Central
+        {
+            get
+            {
+                return new Point(this.Average(x => x.Position.X), this.Average(x => x.Position.Y));
+            }
+        }
+
+        public void SelectNode(bool clearCurrentSelections, bool isSelected = true, params INode[] nodes)
         {
             if (clearCurrentSelections)
             {
@@ -34,6 +46,41 @@ namespace DirN.ViewModels.Node
                 INode node = seletedNodes[0];
                 node.Delete();
                 seletedNodes.Remove(node);
+            }
+        }
+
+        public void MoveNode(Vector delta, bool onlySelected = false)
+        {
+            IList<INode> selectedNodes = onlySelected ? SelectedNodes : this;
+            foreach (var node in selectedNodes)
+            {
+                node.Move(delta);
+            }
+        }
+
+        public void ToCentral(Point centralPoint)
+        {
+            Point[] points = [.. this.Select(x => x.Position)];
+            double avgX = points.Sum(x => x.X) / points.Length;
+            double avgY = points.Sum(x => x.Y) / points.Length;
+            Point nodeCenter = new(avgX, avgY);
+            Vector delta = centralPoint - nodeCenter;
+            MoveNode(delta);
+        }
+
+        public void UpdateLink()
+        {
+            foreach(var node in this)
+            {
+                node.UpdateLink();
+            }
+        }
+
+        public void CutLink()
+        {
+            foreach(var node in this)
+            {
+                node.CutLink();
             }
         }
     }

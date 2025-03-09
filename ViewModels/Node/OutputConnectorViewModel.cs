@@ -17,12 +17,9 @@ namespace DirN.ViewModels.Node
     {
         protected ObservableCollection<ICurve> CurveGroup = [];
 
-        public override IList<INode> LinkedNodes 
+        public override IList<ICurve> LinkedCurves 
         {
-            get
-            {
-               return [..CurveGroup.Where(x=>x.EndPointOwner!= null).Select(c => c.EndPointOwner!.PointerParent.NodeParent)] ;
-            }
+            get => CurveGroup;
         } 
 
         public OutputConnectorViewModel(PointerViewModel parent) : base(parent)
@@ -69,7 +66,7 @@ namespace DirN.ViewModels.Node
         {
             BezierCurve curve = new()
             {
-                StartPointOwner = this,
+                Starter = this,
                 Thickness = 2,
                 Brush = ConnectorBrush
             };

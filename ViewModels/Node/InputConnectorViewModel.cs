@@ -16,12 +16,11 @@ namespace DirN.ViewModels.Node
     {
         protected ICurve? InputCurve;
 
-        public override IList<INode> LinkedNodes { 
+        public override IList<ICurve> LinkedCurves { 
             get 
             {
                 if (InputCurve == null) return [];
-                if (InputCurve.StartPointOwner == null) return [];
-                return [InputCurve.StartPointOwner.PointerParent.NodeParent];
+                return [InputCurve];
             }
         } 
 
@@ -68,7 +67,7 @@ namespace DirN.ViewModels.Node
             {
                 Thickness = 2,
                 Brush=InputCurve?.Brush??ConnectorBrush,
-                StartPointOwner=InputCurve?.StartPointOwner??this,
+                Starter=InputCurve?.Starter??this,
             };
             InputCurve?.Remove();
             InputCurve = null;

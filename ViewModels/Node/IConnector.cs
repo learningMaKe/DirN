@@ -1,5 +1,6 @@
 ﻿using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
+using DirN.Utils.Seralizes;
 using DirN.Views.Node;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Windows.Media;
 namespace DirN.ViewModels.Node
 {
 
-    public interface IConnector:INodePasser,INodeData
+    public interface IConnector:INodePasser,INodeData,IJsonSerialize
     {
         public Color ConnectorColor { get; }
 
@@ -23,7 +24,7 @@ namespace DirN.ViewModels.Node
 
         public bool IsInput { get; }
 
-        public IList<INode> LinkedNodes { get; }
+        public IList<ICurve> LinkedCurves { get; }
 
         public void RemoveLink(ICurve curve);
 

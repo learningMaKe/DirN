@@ -12,13 +12,13 @@ namespace DirN.ViewModels.PointerControl
 {
     public class PStringViewModel:PViewModel
     {
-        public StoredWord SelectedWord { get; set; } = new();
+        public SWord SelectedWord { get; set; } = new();
 
-        public ObservableCollection<StoredWord> StoredWords { get; set; }
+        public ObservableCollection<SWord> StoredWords { get; set; }
 
         public PStringViewModel()
         {
-            StoredWords = NodeGraphicsManager.Instance.StoredWords;
+            StoredWords = NodeGraphicsManager.Instance.NodeDetail.SWords;
         }
 
         protected override void Init()
@@ -29,6 +29,14 @@ namespace DirN.ViewModels.PointerControl
         public override string? GetData()
         {
             return SelectedWord.Word;
+        }
+
+        public override void SetData(object? data)
+        {
+            if (data is string word)
+            {
+                SelectedWord = new() { Word = word, Index = 0 };
+            }
         }
     }
 }

@@ -13,5 +13,6 @@ namespace DirN.ViewModels.PointerControl
         public PointerControlType ControlType { get; }
 
         public IPointer PointerParent { get; set; }
+
     }
 }

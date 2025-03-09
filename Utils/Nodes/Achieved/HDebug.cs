@@ -21,7 +21,7 @@ namespace DirN.Utils.Nodes.Achieved
             Header = "调试节点";
         }
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             string s = string.Join(",", input.Select(x => x ?? "null"));
             MessageBox.Show(s);

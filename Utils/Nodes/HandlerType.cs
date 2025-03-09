@@ -14,7 +14,7 @@ namespace DirN.Utils.Nodes
         Debug,
         Join,
         SWord,
-        GDir,
         FileFilter,
+        Preview,
     }
 }

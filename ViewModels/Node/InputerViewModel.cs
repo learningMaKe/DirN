@@ -56,6 +56,18 @@ namespace DirN.ViewModels.Node
             throw new ArgumentException("校验失败");
         }
 
+        protected override void SetData(object? data)
+        {
+            if (data is null) return;
+            if (AcceptExternal)
+            {
+                InputConnector.Data = data;
+            }
+            else
+            {
+                PointerContainer.Data = data;
+            }
+        }
 
         private void OnConnectorStateUpdated(bool state)
         {

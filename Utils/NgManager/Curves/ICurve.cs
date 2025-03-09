@@ -2,6 +2,7 @@
 
 using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
+using Newtonsoft.Json;
 using System.Windows;
 using System.Windows.Media;
 
@@ -14,8 +15,11 @@ namespace DirN.Utils.NgManager.Curves
         public Point ControlPoint1 { get;  }
         public Point ControlPoint2 { get; }
 
-        public IConnector? StartPointOwner { get; set; }
-        public IConnector? EndPointOwner { get; set; }
+        public IConnector? Starter { get; set; }
+        public IConnector? Ender { get; set; }
+
+        public INode? StartNode { get; }
+        public INode? EndNode { get; }
 
         public double Thickness { get; set; } 
         public Brush Brush { get; set; } 

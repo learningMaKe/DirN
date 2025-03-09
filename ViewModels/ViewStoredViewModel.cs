@@ -15,7 +15,7 @@ namespace DirN.ViewModels
     {
         private readonly IContentDialogService contentDialogService;
 
-        public StoredWord SelectedStoredWord { get; set; } = new();
+        public SWord SelectedStoredWord { get; set; } = new();
 
         public INodeGraphicsManager NodeGraphicsManager { get; set; }
 
@@ -51,7 +51,7 @@ namespace DirN.ViewModels
 
         private void AddStoredWord()
         {
-            NodeGraphicsManager.AddNew();
+            NodeGraphicsManager.AddSWord();
         }
 
         private async Task RemoveStoredWord()
@@ -65,7 +65,7 @@ namespace DirN.ViewModels
             });
             if (result == ContentDialogResult.Primary)
             {
-                NodeGraphicsManager.Remove(SelectedStoredWord);
+                NodeGraphicsManager.RemoveSWord(SelectedStoredWord);
             }
         }
     }

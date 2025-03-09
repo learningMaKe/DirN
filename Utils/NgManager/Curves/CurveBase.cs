@@ -1,8 +1,10 @@
 ﻿using DirN.Utils.Events.EventType;
 using DirN.Utils.Extension;
 using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Converters;
 using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
+using Newtonsoft.Json;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
@@ -16,13 +18,10 @@ using System.Windows.Media;
 
 namespace DirN.Utils.NgManager.Curves
 {
+    [JsonConverter(typeof(CurveConverter))]
     public abstract class CurveBase : BindableBase, ICurve
     {
         private object? data;
-
-        private Type? StarterType=>StartPointOwner?.PointerParent.PointerType;
-
-        private Type? EnderType => EndPointOwner?.PointerParent.PointerType;
 
         [OnChangedMethod(nameof(OnPointChanged))]
         public Point StartPoint { get; set; }
@@ -41,22 +40,25 @@ namespace DirN.Utils.NgManager.Curves
         public Brush Brush { get; set; } = Brushes.Red;
 
         [OnChangedMethod(nameof(OnStartPointOwnerSet))]
-        public IConnector? StartPointOwner { get; set; }
+        public IConnector? Starter { get; set; }
 
         [OnChangedMethod(nameof(OnEndPointOwnerSet))]
-        public IConnector? EndPointOwner { get; set; }
+        public IConnector? Ender { get; set; }
 
-        public bool CanExist => StartPointOwner is not null || EndPointOwner is not null;
+        public INode? StartNode => Starter?.PointerParent.NodeParent;
+        public INode? EndNode => Ender?.PointerParent.NodeParent;
+
+        public bool CanExist => Starter is not null || Ender is not null;
 
         public object? Data
         {
             get
             {
-                if(HandlerManager.ConvertData(StartPointOwner!.PointerParent.PointerType, EndPointOwner!.PointerParent.PointerType, data,out object? result))
+                if(HandlerManager.ConvertData(Starter!.PointerParent.PointerType, Ender!.PointerParent.PointerType, data,out object? result))
                 {
                     return result;
                 }
-                Debug.WriteLine($"数据转换失败 StartPointOwner:{StartPointOwner.PointerParent.PointerType} EndPointOwner:{EndPointOwner.PointerParent.PointerType}");
+                Debug.WriteLine($"数据转换失败 StartPointOwner:{Starter.PointerParent.PointerType} EndPointOwner:{Ender.PointerParent.PointerType}");
                 return null ;
             }
             set
@@ -68,15 +70,15 @@ namespace DirN.Utils.NgManager.Curves
 
         public void MakeSureLinkFlow()
         {
-            if (StartPointOwner is null || EndPointOwner is null) return;
+            if (Starter is null || Ender is null) return;
 
-            if (!(StartPointOwner.IsInput ^ EndPointOwner.IsInput)) return;
+            if (!(Starter.IsInput ^ Ender.IsInput)) return;
 
-            if (StartPointOwner.IsInput)
+            if (Starter.IsInput)
             {
-                (StartPointOwner, EndPointOwner) = (EndPointOwner, StartPointOwner);
+                (Starter, Ender) = (Ender, Starter);
             }
-            Brush = new LinearGradientBrush(StartPointOwner.ConnectorColor, EndPointOwner.ConnectorColor, StartPoint, EndPoint)
+            Brush = new LinearGradientBrush(Starter.ConnectorColor, Ender.ConnectorColor, StartPoint, EndPoint)
             {
                 MappingMode = BrushMappingMode.Absolute,
             };
@@ -84,10 +86,10 @@ namespace DirN.Utils.NgManager.Curves
 
         public void Remove()
         {
-            StartPointOwner?.RemoveLink(this);
-            EndPointOwner?.RemoveLink(this);
+            Starter?.RemoveLink(this);
+            Ender?.RemoveLink(this);
             TooltipManager.Instance.RemoveTooltip(this);
-            NodeGraphicsManager.Instance.BezierCurves.Remove(this);
+            NodeGraphicsManager.Instance.RemoveCurve(this);
         }
 
         private void OnPointChanged()
@@ -100,13 +102,13 @@ namespace DirN.Utils.NgManager.Curves
 
         public void UpdateLink()
         {
-            if(StartPointOwner is not null)
+            if(Starter is not null)
             {
-                StartPoint = RelativeTo(StartPointOwner.Connector);
+                StartPoint = RelativeTo(Starter.Connector);
             }
-            if(EndPointOwner is not null)
+            if(Ender is not null)
             {
-                EndPoint = RelativeTo(EndPointOwner.Connector);
+                EndPoint = RelativeTo(Ender.Connector);
             }
         }
 
@@ -116,15 +118,15 @@ namespace DirN.Utils.NgManager.Curves
         /// </summary>
         public void CutLink(IConnector connector)
         {
-            if(StartPointOwner == connector)
+            if(Starter == connector)
             {
-                StartPointOwner.RemoveLink(this);
-                StartPointOwner = null;
+                Starter.RemoveLink(this);
+                Starter = null;
             }
-            else if(EndPointOwner == connector)
+            else if(Ender == connector)
             {
-                EndPointOwner.RemoveLink(this);
-                EndPointOwner = null;
+                Ender.RemoveLink(this);
+                Ender = null;
             }
         }
 
@@ -136,7 +138,7 @@ namespace DirN.Utils.NgManager.Curves
 
         private void OnStartPointOwnerSet()
         {
-            if(OnOwnerSet(StartPointOwner,out Point startPoint))
+            if(OnOwnerSet(Starter,out Point startPoint))
             {
                 StartPoint = startPoint;
             }
@@ -145,7 +147,7 @@ namespace DirN.Utils.NgManager.Curves
 
         private void OnEndPointOwnerSet()
         {
-            if(OnOwnerSet(EndPointOwner,out Point endPoint))
+            if(OnOwnerSet(Ender,out Point endPoint))
             {
                 EndPoint = endPoint;
             }
@@ -162,13 +164,13 @@ namespace DirN.Utils.NgManager.Curves
 
         private void CheckLinkConvertable()
         {
-            if(StartPointOwner is null || EndPointOwner is null)
+            if(Starter is null || Ender is null)
             {
                 TooltipManager.Instance.RemoveTooltip(this);
                 return;
             }
-            Type startType = StartPointOwner.PointerParent.PointerType;
-            Type endType = EndPointOwner.PointerParent.PointerType;
+            Type startType = Starter.PointerParent.PointerType;
+            Type endType = Ender.PointerParent.PointerType;
             if (!HandlerManager.CanConvertData(startType, endType))
             {
                 TooltipManager.Instance.Tooltip(this, $"{startType.Name}->{endType.Name} 不能转换", TooltipType.Error);

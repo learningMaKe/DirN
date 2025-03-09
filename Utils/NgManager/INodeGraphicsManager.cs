@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.NgManager.Curves;
+using DirN.Utils.Nodes;
 using DirN.ViewModels.Node;
 using System;
 using System.Collections.Generic;
@@ -17,13 +18,21 @@ namespace DirN.Utils.NgManager
 
         public double NodeScale { get;  set; }
 
+        public NodeDetail NodeDetail { get; }
+
         public ObservableCollection<MenuItemInfo> CanvasContextMenu { get; }
 
-        public NodeGroup Nodes { get; }
+        public void AddNode(INode node);
 
-        public ObservableCollection<ICurve> BezierCurves { get; }
+        public void AddCurve(ICurve curve);
 
-        public bool HaveLoopEdge();
+        public void RemoveNode(INode node);
+
+        public void RemoveCurve(ICurve curve);
+
+        public void AddNode(HandlerType handlerType, Point position = default);
+
+        public bool LoopDetect();
 
         public void MoveNode(Vector delta, bool onlySelected = false);
 
@@ -31,14 +40,18 @@ namespace DirN.Utils.NgManager
 
         public void SelectNode(params INode[] nodes);
 
-        public void AddNew();
+        public void AddSWord();
 
-        public void Remove(StoredWord word);
+        public void RemoveSWord(SWord word);
 
         public void Execute();
 
         public void ZoomIn();
 
         public void ZoomOut();
+
+        public void AlignNodes(NodeAlignment alignment);
+
+        public void SaveNode();
     }
 }

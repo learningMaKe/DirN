@@ -36,7 +36,7 @@
         <StackPanel CanVerticallyScroll="True">
           <TextBlock Margin="5" Text="保留字" />
           <ListBox
-            ItemsSource="{Binding NodeGraphicsManager.StoredWords, Mode=OneWay}"
+            ItemsSource="{Binding NodeGraphicsManager.NodeDetail.SWords, Mode=OneWay}"
             ScrollViewer.CanContentScroll="True"
             SelectedItem="{Binding SelectedStoredWord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ListBox.ItemsPanel>

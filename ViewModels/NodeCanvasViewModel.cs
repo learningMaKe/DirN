@@ -92,6 +92,11 @@ namespace DirN.ViewModels
             EventAggregator.GetEvent<NodeGraphicsEvent.GetCentralPointEvent>().Subscribe(GetCentralPoint);
         }
 
+        private void GraphicsAlignment(KeyEventArgs args)
+        {
+
+        }
+
         private void MouseWheel(MouseWheelEventArgs args)
         {
             if(args.Delta > 0)
@@ -174,7 +179,7 @@ namespace DirN.ViewModels
             Point point = Mouse.GetPosition(Canvas).Restore(true);
             args.Curve!.EndPoint = point;
             FocusedLink = args;
-            NodeGraphicsManager.BezierCurves.Add(args.Curve);
+            NodeGraphicsManager.AddCurve(args.Curve);
         }
 
         private void MouseLeftButtonUp(MouseButtonEventArgs e)
@@ -184,7 +189,8 @@ namespace DirN.ViewModels
                 Point pt = e.GetPosition(Canvas);
                 PointHitTestParameters parameters = new(pt);
                 VisualTreeHelper.HitTest(Canvas, FocusedLink.FilterCallback, FocusedLink.ResultCallback, parameters);
-                if(FocusedLink.Curve!.EndPointOwner is null)
+                NodeGraphicsManager.LoopDetect();
+                if(FocusedLink.Curve!.Ender is null)
                 {
                     FocusedLink.Curve!.Remove();
                 }

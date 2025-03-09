@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.NgManager;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,11 @@ namespace DirN.Utils.Extension
             Point leftTop = new(rect.Left - centralPoint.X, rect.Top - centralPoint.Y);
             leftTop = new Point(centralPoint.X + leftTop.X * scale, centralPoint.Y + leftTop.Y * scale);
             return new Rect(leftTop, new Size(rect.Width * scale, rect.Height * scale));
+        }
+
+        public static Rect ScaleRestore(this Rect rect)
+        {
+            return rect.ScaleTransform(NodeGraphicsManager.Instance.GetCentralPoint(), NodeGraphicsManager.Instance.NodeScale);
         }
     }
 }

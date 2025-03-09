@@ -26,9 +26,10 @@ namespace DirN.Utils.Nodes.Dynamics
 
             if (constructor is null) return default;
 
-            // 创建元组实例
-            object? tupleInstance = constructor.Invoke([.. values]);
+            object? tupleInstance = null;
 
+            // 创建元组实例
+            tupleInstance = constructor.Invoke([.. values]);
             T? tuple = (T?)tupleInstance;
             if (tuple is null) return default;
             return tuple;

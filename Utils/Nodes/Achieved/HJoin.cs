@@ -12,11 +12,11 @@ using System.Windows.Media;
 namespace DirN.Utils.Nodes.Achieved
 {
     [HDes("连接", "ForestGreen")]
-    public class HJoin : AggregatorHandler<Tuple<string,string>,string>
+    public class HJoin : AggregatorHandler<(string,string,string),string>
     {
-        protected override string Aggregate(Tuple<string, string> input)
+        protected override string Aggregate((string, string, string) input)
         {
-            return input.Item1 + input.Item2;
+            return input.Item1 + input.Item2 + input.Item3;
         }
     }
 }

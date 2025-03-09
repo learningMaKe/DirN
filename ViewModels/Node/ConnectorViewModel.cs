@@ -19,6 +19,8 @@ namespace DirN.ViewModels.Node
             set => SetData(value);
         }
 
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         public DelegateCommand<MouseButtonEventArgs> MouseLeftButtonDownCommand { get;private set; }
         
         public IPointer PointerParent { get; set; }
@@ -29,7 +31,7 @@ namespace DirN.ViewModels.Node
 
         public bool IsInput => PointerParent.IsInput;
 
-        public abstract IList<INode> LinkedNodes { get; }
+        public abstract IList<ICurve> LinkedCurves { get; }
 
         public Connector Connector
         {
@@ -82,7 +84,7 @@ namespace DirN.ViewModels.Node
 
                     if (!(viewModel.IsInput ^ IsInput)) return HitTestResultBehavior.Continue;
 
-                    linkCurve.EndPointOwner = viewModel;
+                    linkCurve.Ender = viewModel;
                     linkCurve.MakeSureLinkFlow();
 
                     return HitTestResultBehavior.Stop;

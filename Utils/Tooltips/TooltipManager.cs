@@ -25,5 +25,10 @@ namespace DirN.Utils.Tooltips
         {
             Tooltipers.Remove(tooltipable);
         }
+
+        public void Clear()
+        {
+            Tooltipers.Clear();
+        }
     }
 }

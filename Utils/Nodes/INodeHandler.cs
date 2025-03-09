@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Base;
+using DirN.Utils.NgManager.Curves;
 using DirN.ViewModels.Node;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,9 @@ namespace DirN.Utils.Nodes
 
         public string Description { get; set; }
 
-        public IList<INode> Next { get; }
+        public IList<ICurve> OutputCurve { get; }
+
+        public IList<ICurve> InputCurve { get; }
 
         public Color MainColor { get; set; }
 
@@ -28,15 +31,16 @@ namespace DirN.Utils.Nodes
 
         public Color HeaderEffectColor { get; }
 
-        public IList<object?>? GetOutput();
+        public IList<INode> Predecessors { get; }
+
+        public ObservableCollection<IPointer> InputGroup { get; set; }
+        public ObservableCollection<IPointer> OutputGroup { get; set; }
+
+        public IList<object?>? HandleData();
 
         /// <summary>
         /// 数据经由该节点流向下一个节点
         /// </summary>
         public bool DataFlow();
-
-        public ObservableCollection<IPointer> InputGroup { get; set; }
-        public ObservableCollection<IPointer> OutputGroup { get; set; }
-
     }
 }

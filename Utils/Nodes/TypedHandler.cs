@@ -1,4 +1,5 @@
-﻿using DirN.Utils.Nodes.Attributes;
+﻿using DirN.Utils.NgManager.Curves;
+using DirN.Utils.Nodes.Attributes;
 using DirN.Utils.Nodes.Bulider;
 using DirN.Utils.Nodes.Exceptions;
 using DirN.Utils.Tooltips;
@@ -29,7 +30,8 @@ namespace DirN.Utils.Nodes
         public ObservableCollection<IPointer> InputGroup { get; set; } = [];
         public ObservableCollection<IPointer> OutputGroup { get; set; } = [];
         
-        public IList<INode> Next=> [.. OutputGroup.SelectMany(x=>x.Connector.LinkedNodes).Distinct()];
+        public IList<ICurve> OutputCurve=> [.. OutputGroup.SelectMany(x=>x.Connector.LinkedCurves).Distinct()];
+        public IList<ICurve> InputCurve => [.. InputGroup.SelectMany(x => x.Connector.LinkedCurves).Distinct()];
 
         public string Header { get; set; } = "Undefined";
 
@@ -41,6 +43,23 @@ namespace DirN.Utils.Nodes
         public Brush HeaderBrush { get;private set; } = Brushes.Black;
 
         public Color HeaderEffectColor { get;private set; } = Colors.Black;
+
+        public IList<INode> Predecessors
+        {
+            get
+            {
+                IList<INode> predecessors = [];
+                foreach (var input in InputGroup)
+                {
+                    IList<ICurve> linkedCurves = input.Connector.LinkedCurves;
+                    if (linkedCurves.Count == 0) continue;
+                    INode? predecessor = linkedCurves.Select(x => x.StartNode).FirstOrDefault();
+                    if (predecessor is null) continue;
+                    predecessors.Add(predecessor);
+                }
+                return predecessors;
+            }
+        }
 
         public void Init(INode parent) 
         {
@@ -63,7 +82,7 @@ namespace DirN.Utils.Nodes
 
         public bool DataFlow()
         {
-            IList<object?>? output = GetOutput();
+            IList<object?>? output = HandleData();
             if (output is null) return false;
             return SetOutput(output);
         }
@@ -85,16 +104,15 @@ namespace DirN.Utils.Nodes
             return true;
         }
 
-        public IList<object?>? GetOutput()
+        public bool GetInput(out IList<object> datas)
         {
-            //object?[] input = [.. InputGroup.Select(x => x.Data)];
-            if (Parent is null) return null;
-            IList<object> datas = [];
+            datas = [];
+            if (Parent is null) return false;
             bool isError = false;
             string errorInfo = string.Empty;
-            foreach(var input in InputGroup)
+            foreach (var input in InputGroup)
             {
-                if(input.Data is not null)
+                if (input.Data is not null)
                 {
                     datas.Add(input.Data);
                     continue;
@@ -105,9 +123,18 @@ namespace DirN.Utils.Nodes
             if (isError)
             {
                 TooltipManager.Instance.Tooltip(Parent, errorInfo, TooltipType.Error);
-                return null;
+                return false;
             }
-            IList<object?>? output = Handle([.. datas]);
+            return true;
+        }
+
+        public IList<object?>? HandleData()
+        {
+            IList<object?>? output = null;
+            if(GetInput(out IList<object> datas))
+            {
+                output = Handle([.. datas]);
+            }
             return output;
         }
 

@@ -1,8 +1,11 @@
 ﻿using DirN.Utils.Debugs;
 using DirN.Utils.Extension;
 using DirN.Utils.NgManager;
+using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Converters;
 using DirN.Utils.Tooltips;
+using Newtonsoft.Json;
 using PropertyChanged;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,11 +15,11 @@ using System.Windows.Input;
 
 namespace DirN.ViewModels.Node
 {
+    [DebuggerDisplay("HashCode = {GetHashCode()}")]
+    [JsonConverter(typeof(NodeConverter))]
     public class BaseNodeViewModel : BindableBase,INode,IViewGetter
     {
         public bool IsSelected { get; set; }
-
-        public NodeGraphicsManager NodeGraphicsManager;
 
         [OnChangedMethod(nameof(OnPositionChanged))]
         public Point Position { get; set; }
@@ -25,7 +28,11 @@ namespace DirN.ViewModels.Node
 
         public int ZIndex { get; set; }
 
-        public IList<INode> Next
+        public bool IsExpanded { get; set; } = true;
+
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public IList<ICurve> Output
         {
             get
             {
@@ -33,7 +40,19 @@ namespace DirN.ViewModels.Node
                 {
                     return [];
                 }
-                return Handler.Next;
+                return Handler.OutputCurve;
+            }
+        }
+
+        public IList<ICurve> Input
+        {
+            get
+            {
+                if (Handler == null)
+                {
+                    return [];
+                }
+                return Handler.InputCurve;
             }
         }
 
@@ -49,7 +68,6 @@ namespace DirN.ViewModels.Node
         public DelegateCommand DataFlowCommand { get; private set; }
 
         public DelegateCommand<NodeAlignment?> AlignCommand { get; private set; }
-
 
         [OnChangedMethod(nameof(OnHandlerTypeChanged))]
         public HandlerType HandlerType { get; set; }
@@ -71,9 +89,8 @@ namespace DirN.ViewModels.Node
 
         public Func<FrameworkElement>? GetView { get; set; }
 
-        public BaseNodeViewModel(NodeGraphicsManager nodeGraphicsManager)
+        public BaseNodeViewModel()
         {
-            this.NodeGraphicsManager = nodeGraphicsManager;
             DragDeltaCommand = new(DragDelta);
             DragCompletedCommand= new(DragCompleted);
             DragStartedCommand = new(DragStarted);
@@ -90,7 +107,12 @@ namespace DirN.ViewModels.Node
         private void Align(NodeAlignment? alignment)
         {
             if (alignment == null) return;
-            NodeGraphicsManager.AlignNode(this, alignment.Value);
+            NodeGraphicsManager.Instance.AlignNode(this, alignment.Value);
+        }
+
+        public bool DataFlow()
+        {
+            return Handler?.DataFlow() ?? false;
         }
 
         public void Move(Vector delta)
@@ -110,7 +132,7 @@ namespace DirN.ViewModels.Node
 
         public Rect GetScaledRect()
         {
-            return GetRect().ScaleTransform(NodeGraphicsManager.GetCentralPoint(), NodeGraphicsManager.NodeScale);
+            return GetRect().ScaleRestore();
         }
 
         public void UpdateLink()
@@ -125,7 +147,7 @@ namespace DirN.ViewModels.Node
 
         private void MouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            NodeGraphicsManager.SelectNode(this);
+            NodeGraphicsManager.Instance.SelectNode(this);
         }
 
         private void OnPositionChanged()
@@ -140,13 +162,14 @@ namespace DirN.ViewModels.Node
         private void DragDelta(DragDeltaEventArgs e)
         {
             Vector delta = new(e.HorizontalChange, e.VerticalChange);
-            NodeGraphicsManager.MoveNode(delta, true);
+            NodeGraphicsManager.Instance.MoveNode(delta, true);
         }
 
         private void Remove()
         {
             CutLink();
-            NodeGraphicsManager.Nodes.Remove(this);
+            TooltipManager.Instance.RemoveTooltip(this);
+            NodeGraphicsManager.Instance.RemoveNode(this);
         }
 
         private void DragCompleted(DragCompletedEventArgs e)
@@ -174,14 +197,15 @@ namespace DirN.ViewModels.Node
 
         private void OnDebug()
         {
-            //DebugManager.Instance.DrawRect(GetRect().ScaleTransform(NodeGraphicsManager.GetCentralPoint(), NodeGraphicsManager.NodeScale));
-            string strs = string.Join("\n", Handler!.InputGroup.Select(i => i.PointerConfig!.Header + " " + i.PointerConfig!.GetHashCode().ToString()));
-            MessageBox.Show(strs);
+            foreach (var predecessor in Handler!.Predecessors)
+            {
+                TooltipManager.Instance.Tooltip(predecessor, "Predecessor");
+            }
         }
 
         private void OnTestOutput()
         {
-            string outputs = string.Join("\n", Handler!.GetOutput() ?? ["No output"]);
+            string outputs = string.Join("\n", Handler!.HandleData() ?? ["No output"]);
             if (!string.IsNullOrEmpty(outputs))
             {
                 MessageBox.Show(outputs);

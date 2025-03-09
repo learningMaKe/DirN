@@ -22,8 +22,8 @@ namespace DirN.Utils.Nodes.Maps
         {
             source.
                 Set(MP<DCString2FileInfo, string, FileInfo>()).
-                Set(MP<DCString2DirectoryInfo, string, DirectoryInfo>());
-                //Set(MP<DCString2FileInfoArray, string, FileInfo[]>());
+                Set(MP<DCString2DirectoryInfo, string, DirectoryInfo>()).
+                Set(MP<DCString2FileInfoArray, string, FileInfo[]>());
 
         }
     }

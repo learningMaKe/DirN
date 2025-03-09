@@ -15,7 +15,7 @@ namespace DirN.Utils.Nodes.Achieved
 
         protected override Type[] OutputTypes => [typeof(string)];
 
-        protected override IList<object?> Handle(IList<object?> input)
+        protected override IList<object?> Handle(IList<object> input)
         {
             throw new NotImplementedException();
         }

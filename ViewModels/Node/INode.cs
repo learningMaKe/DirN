@@ -1,4 +1,6 @@
-﻿using DirN.Utils.Nodes;
+﻿using DirN.Utils.NgManager.Curves;
+using DirN.Utils.Nodes;
+using DirN.Utils.Seralizes;
 using DirN.Utils.Tooltips;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Windows;
 
 namespace DirN.ViewModels.Node
 {
-    public interface INode:INodePasser,ITooltipable
+    public interface INode:INodePasser,ITooltipable,IJsonSerialize
     {
         public bool IsSelected { get; set; }
 
@@ -18,14 +20,36 @@ namespace DirN.ViewModels.Node
 
         public INodeHandler? Handler { get; }
 
-        public IList<INode> Next { get; }
+        /// <summary>
+        /// 节点的所有输出节点
+        /// </summary>
+        public IList<ICurve> Output { get; }
+
+        /// <summary>
+        /// 节点的所有输入节点
+        /// </summary>
+        public IList<ICurve> Input { get; }
+
+        public IList<INode> OutputNodes => Output.Where(x => x.Ender != null).Select(x => x.Ender!.PointerParent.NodeParent).Distinct().ToList() ?? [];
+
+        public IList<INode> InputNodes => Input.Where(x => x.Starter != null).Select(x => x.Starter!.PointerParent.NodeParent).Distinct().ToList() ?? [];
+
+        public IList<ICurve> Linked => [.. Input.Concat(Output).Distinct()];
+
+        public IList<object?> InputDataGroup => Handler?.InputGroup.Select(x => x.Data).ToList() ?? [];
+
+        public IList<Guid> InputIds => Handler?.InputGroup.Select(x => x.Connector.Id).ToList() ?? [];
+
+        public IList<Guid> OutputIds => Handler?.OutputGroup.Select(x => x.Connector.Id).ToList() ?? [];
 
         public void Move(Vector delta);
 
-        public void Delete();
+        public void Delete() { }
 
         public Rect GetRect();
 
         public Rect GetScaledRect();
+
+        public bool DataFlow();
     }
 }

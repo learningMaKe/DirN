@@ -78,10 +78,7 @@ namespace DirN.Utils.NgManager.Curves
             {
                 (Starter, Ender) = (Ender, Starter);
             }
-            Brush = new LinearGradientBrush(Starter.ConnectorColor, Ender.ConnectorColor, StartPoint, EndPoint)
-            {
-                MappingMode = BrushMappingMode.Absolute,
-            };
+            ReBrush();
         }
 
         public void Remove()
@@ -114,7 +111,7 @@ namespace DirN.Utils.NgManager.Curves
 
         /// <summary>
         /// 切断与指定连接器的连接
-        /// 如何没有起点和终点，则删除
+        /// 如果没有起点和终点，则删除
         /// </summary>
         public void CutLink(IConnector connector)
         {
@@ -128,6 +125,15 @@ namespace DirN.Utils.NgManager.Curves
                 Ender.RemoveLink(this);
                 Ender = null;
             }
+        }
+
+        private void ReBrush()
+        {
+            if (Starter is null || Ender is null) return;
+            Brush = new LinearGradientBrush(Starter.ConnectorColor, Ender.ConnectorColor, StartPoint, EndPoint)
+            {
+                MappingMode = BrushMappingMode.Absolute,
+            };
         }
 
         private static Point RelativeTo(FrameworkElement owner)
@@ -159,6 +165,7 @@ namespace DirN.Utils.NgManager.Curves
             if (connector is null) return false;
             point = RelativeTo(connector.Connector);
             connector.AddLink(this);
+            ReBrush();
             return true;
         }
 
@@ -177,6 +184,10 @@ namespace DirN.Utils.NgManager.Curves
             }
         }
 
+        public override string ToString()
+        {
+            return $"{StartPoint.X:F2},{StartPoint.Y:F2} -> {EndPoint.X:F2},{EndPoint.Y:F2}";
+        }
 
     }
 }

@@ -172,6 +172,8 @@ namespace DirN.ViewModels
         {
             if (args.Element is null) return;
             args.CanvasRelativePoint = args.Element.TranslatePoint(args.ElementRelativePoint, Canvas);
+            
+            //Debug.WriteLine(args.CanvasRelativePoint);
         }
 
         private void MakeLink(NodeGraphicsArgs.LinkArgs args)

@@ -12,15 +12,15 @@ using DirN.Utils.PreManager;
 using DirN.Utils.NgManager;
 using System.Windows;
 using DirN.Utils.Tooltips;
+using System.Diagnostics;
+using DirN.Utils.Debugs;
 
 namespace DirN.ViewModels
 {
     public class SearcherViewModel : BaseViewModel
     {
-        public DirectoryManager DirectoryManager { get;private set; }
         public PreviewerManager PreviewerManager { get; private set; }
-        public INodeGraphicsManager NodeGraphicsManager { get; private set; }
-
+        
         public string StartLocation { get; set; } = DirectoryManager.UserProfilePath;
 
         public DelegateCommand TestCommand { get; set; }
@@ -28,30 +28,73 @@ namespace DirN.ViewModels
         public DelegateCommand<KeyEventArgs> ConfirmCommand { get; set; }
         public DelegateCommand LoadedCommand { get; set; }
         public DelegateCommand ExecuteCommand { get; set; }
+        public DelegateCommand JsonSelectCommand { get; set; }
+        public DelegateCommand SaveNodeCommand { get; set; }
+        public DelegateCommand SaveAsNodeCommand { get; set; }
+        public DelegateCommand OpenJsonHomeCommand { get; set; }
+        public DelegateCommand ExecuteOrderCommand { get; set; }
 
         public SearcherViewModel(IContainerProvider provider) : base(provider)
         {
-            DirectoryManager = provider.Resolve<DirectoryManager>();
             PreviewerManager = provider.Resolve<PreviewerManager>();
-            NodeGraphicsManager = provider.Resolve<INodeGraphicsManager>();
-
+            
             TestCommand = new(Test);
             BrowseCommand = new(Browse);
             ConfirmCommand = new(Confirm);
             LoadedCommand = new(Loaded);
             ExecuteCommand= new(Execute);
+            JsonSelectCommand = new(JsonSelect);
+            SaveNodeCommand = new(SaveNode);
+            SaveAsNodeCommand = new(SaveAsNode);
+            OpenJsonHomeCommand = new(OpenJsonHome);
+            ExecuteOrderCommand = new(ExecuteOrder);
             EventAggregator.GetEvent<DirectoryManagerEvent.DirectoryChangedEvent>().Subscribe(OnDirectoryChanged);
+        }
+
+        private void OpenJsonHome()
+        {
+            try
+            {
+                // 使用Process.Start打开资源管理器
+                Process.Start("explorer.exe", DirectoryManager.JsonHome);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("打开文件夹时出错: " + ex.Message);
+            }
+        }
+
+        private void SaveNode()
+        {
+            NodeGraphicsManager.Instance.SaveNode();
+        }
+
+        private void SaveAsNode()
+        {
+            NodeGraphicsManager.Instance.SaveAsNode();
+        }
+
+        private void JsonSelect()
+        {
+            NodeGraphicsManager.Instance.NodeDetailSelect();
         }
 
         private void Execute()
         {
-            NodeGraphicsManager.Execute();
+            NodeGraphicsManager.Instance.Execute();
         }
 
+        private void ExecuteOrder()
+        {
+            NodeGraphicsManager.Instance.ExecuteOrder();
+        }
 
         private void Test()
         {
-            NodeGraphicsManager.SaveNode();
+            foreach(var curve in NodeGraphicsManager.Instance.NodeDetail.BezierCurves)
+            {
+                TooltipManager.Instance.Tooltip(curve, $"{curve.StartPoint.X:F2},{curve.StartPoint.Y:F2}->{curve.EndPoint.X:F2},{curve.EndPoint.Y:F2}");
+            }
         }
 
         private void Browse()
@@ -79,7 +122,7 @@ namespace DirN.ViewModels
 
         private void SetDirectory(string directory)
         {
-            DirectoryManager.WorkDirectory = directory;
+            DirectoryManager.Instance.WorkDirectory = directory;
             PreviewerManager.PreviewerVisibility = true;
         }
 
@@ -90,7 +133,7 @@ namespace DirN.ViewModels
 
         private void Loaded()
         {
-            StartLocation = DirectoryManager.WorkDirectory;
+            StartLocation = DirectoryManager.Instance.WorkDirectory;
         }
 
     }

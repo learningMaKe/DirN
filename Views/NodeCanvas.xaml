@@ -82,6 +82,7 @@
       VerticalAlignment="Stretch"
       SnapsToDevicePixels="True"
       UseLayoutRounding="True">
+
       <Grid.RenderTransform>
         <ScaleTransform CenterX="{Binding ElementName=CanvasContainer, Path=ActualWidth, Converter={StaticResource Divide2Converter}}" CenterY="{Binding ElementName=CanvasContainer, Path=ActualHeight, Converter={StaticResource Divide2Converter}}" ScaleX="{Binding NodeGraphicsManager.NodeScale}" ScaleY="{Binding NodeGraphicsManager.NodeScale}" />
       </Grid.RenderTransform>

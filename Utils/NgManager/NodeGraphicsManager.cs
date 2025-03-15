@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Debugs;
+using DirN.Utils.DirManager;
 using DirN.Utils.Events.EventType;
 using DirN.Utils.Extension;
 using DirN.Utils.KManager;
@@ -15,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
@@ -35,6 +37,8 @@ namespace DirN.Utils.NgManager
         private const double MinNodeScale = 0.3;
         private const double NodeScaleStep = 0.01;
 
+        private readonly NodeGraphicsArgs.GetCanvasRelativePointArgs args = new();
+
         private static readonly Vector CopyOffset = new(10, 10);
         private IList<(HandlerType,Point)> CopiedNode = [];
         #endregion
@@ -47,6 +51,13 @@ namespace DirN.Utils.NgManager
 
         public Point CentralPoint => GetCentralPoint();
 
+        [OnChangedMethod(nameof(OnWorkFileChanged))]
+        public string WorkFile { get; set; } = DefaultText;
+
+        public bool IsWorkFileSet => !string.IsNullOrEmpty(WorkFile)  && File.Exists(WorkFile);
+
+        public bool IsDirty { get; set; } = false;
+
         public ObservableCollection<MenuItemInfo> CanvasContextMenu { get; private set; } = [];
 
         [OnChangedMethod(nameof(OnStoredWordVisiblityChanged))]
@@ -55,7 +66,8 @@ namespace DirN.Utils.NgManager
         public NodeDetail NodeDetail { get; private set; } = new();
 
         public DelegateCommand<HandlerType?> AddNewNodeCommand { get; private set; }
-        
+        public event Action<string>? WorkFileChangedEvent;
+
         #endregion
 
         public NodeGraphicsManager(IContainerProvider containerProvider):base(containerProvider)
@@ -123,9 +135,43 @@ namespace DirN.Utils.NgManager
             NodeDetail.Execute();
         }
 
+        public void ExecuteOrder()
+        {
+            NodeDetail.ExecuteOrder();
+        }
+
         #endregion
 
         #region Node Operations
+
+        public void NodeDetailSelect()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Json files (*.json)|*.json",
+                InitialDirectory = DirectoryManager.JsonHome,
+            };
+            bool? result = dialog.ShowDialog();
+            if (result == false) return;
+            using StreamReader streamReader = new(dialog.FileName);
+            string json = streamReader.ReadToEnd();
+            try
+            {
+                NodeDetail? detail = JsonConvert.DeserializeObject<NodeDetail>(json);
+                if (detail is not null)
+                {
+                    NodeDetail = detail;
+                    // TODO: Update Node Detail
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowText($"打开文件失败！\n{ex.Message}");
+                return;
+            }
+
+            WorkFile = dialog.FileName;
+        }
 
         public void MakeLink(NodeGraphicsArgs.LinkArgs args)
         {
@@ -160,6 +206,7 @@ namespace DirN.Utils.NgManager
         public void FocusNode()
         {
             NodeDetail.Nodes.ToCentral(CentralPoint);
+            NodeDetail.Nodes.UpdateLink();
         }
 
         public void AlignNode(INode node, NodeAlignment alignment)
@@ -172,12 +219,52 @@ namespace DirN.Utils.NgManager
             NodeDetail.AlignNodes(alignment);
         }
 
-
         public void SaveNode()
         {
-            string str = JsonConvert.SerializeObject(NodeDetail, Formatting.Indented);
+            //TODO: Save NodeDetail to file
+            if (!IsWorkFileSet)
+            {
+                SaveAsNode();
+                return;
+            }
+            if (!SerializeNodeDetail(out string str)) return;
             Debug.WriteLine(str);
-            NodeDetail? detail = JsonConvert.DeserializeObject<NodeDetail>(str);
+            File.WriteAllText(WorkFile, str);
+            //NodeDetail? detail = JsonConvert.DeserializeObject<NodeDetail>(str);
+        }
+
+        public void SaveAsNode()
+        {
+            if (!SerializeNodeDetail(out string str)) return;
+            string name = Path.GetFileNameWithoutExtension(WorkFile);
+            string? directory = Path.GetDirectoryName(WorkFile);
+            if (string.IsNullOrEmpty(directory))
+            {
+                directory = DirectoryManager.JsonHome;
+            }
+            string baseFile = Path.Combine(directory, name);
+            string saveFile = baseFile + ".json";
+            int suffix = 1;
+            while (File.Exists(saveFile))
+            {
+                if (suffix > 30)
+                {
+                    saveFile = baseFile + ".json";
+                    break;
+                }
+                saveFile = baseFile + "_" + suffix + ".json";
+                suffix++;
+            }
+            var saveDialog = new Microsoft.Win32.SaveFileDialog()
+            {
+                Filter = "JSON文件|*.json",
+                InitialDirectory = directory,
+                Title = "另存节点文件",
+                FileName = Path.GetFileName(saveFile)
+            };
+            if (saveDialog.ShowDialog() == false) return;
+            File.WriteAllText(saveDialog.FileName, str);
+            WorkFile = saveDialog.FileName;
         }
 
         #endregion
@@ -192,8 +279,14 @@ namespace DirN.Utils.NgManager
         {
             NodeDetail.RemoveSWord(word);
         }
+
+
+        public void ClearAllSWords()
+        {
+            NodeDetail.ClearAllSWords();
+        }
         #endregion
-        
+
         #region Get Point
 
         public Point GetCentralPoint()
@@ -203,13 +296,10 @@ namespace DirN.Utils.NgManager
             return args.CentralPoint;
         }
 
-        public Point GetCanvasRelativePoint(UIElement element,Point pointRelativeToElement)
+        public Point GetCanvasRelativePoint(FrameworkElement element,Point pointRelativeToElement)
         {
-            NodeGraphicsArgs.GetCanvasRelativePointArgs args = new()
-            {
-                Element = element,
-                ElementRelativePoint = pointRelativeToElement
-            };
+            args.Element = element;
+            args.ElementRelativePoint = pointRelativeToElement; 
             eventAggregator.GetEvent<NodeGraphicsEvent.GetCanvasRelativePointEvent>().Publish(args);
             return args.CanvasRelativePoint;
         }
@@ -239,6 +329,22 @@ namespace DirN.Utils.NgManager
         #endregion
 
         #region Private Methods
+
+        private bool SerializeNodeDetail(out string str)
+        {
+            str = string.Empty;
+            try
+            {
+                str = JsonConvert.SerializeObject(NodeDetail, Formatting.Indented);
+            }
+            catch(Exception ex)
+            {
+                ShowText($"序列化节点失败！\n{ex.Message}");
+                return false;
+            }
+            return true;
+
+        }
         #region Init
 
         private void InitCanvasContextMenu()
@@ -318,6 +424,12 @@ namespace DirN.Utils.NgManager
         {
             eventAggregator.GetEvent<NodeGraphicsEvent.StoredWordVisibilityEvent>().Publish(StoredWordVisiblity);
         }
+
+        private void OnWorkFileChanged()
+        {
+            WorkFileChangedEvent?.Invoke(WorkFile);
+        }
+
 
         #endregion
     }

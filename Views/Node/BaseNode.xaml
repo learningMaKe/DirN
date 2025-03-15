@@ -7,6 +7,7 @@
   xmlns:local="clr-namespace:DirN.Views.Node"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:node="clr-namespace:DirN.ViewModels.Node"
+  xmlns:nui="clr-namespace:DirN.UI.NodeExpander"
   xmlns:prism="http://prismlibrary.com/"
   xmlns:proxy="clr-namespace:DirN.Utils.BindingProxy"
   xmlns:system="clr-namespace:System;assembly=mscorlib"
@@ -50,13 +51,12 @@
       BorderBrush="{Binding IsSelected, Converter={StaticResource BoolenToWhiteConverter}}"
       BorderThickness="1"
       CornerRadius="{StaticResource ControlCornerRadius}">
-      <ui:CardExpander
+      <nui:NodeExpander
         MinWidth="160"
-        Padding="4"
-        Background="{Binding Handler.HeaderBrush}"
-        ContentPadding="2,16"
-        IsExpanded="{Binding IsExpanded}">
-        <ui:CardExpander.Header>
+        Margin="4"
+        Background="{Binding Handler.HeaderBrush}">
+        <nui:NodeExpander.Header>
+
           <Grid>
             <Grid.ContextMenu>
               <ContextMenu DataContext="{StaticResource BindingProxy}">
@@ -79,9 +79,9 @@
             </Grid.ContextMenu>
             <TextBlock Text="{Binding Handler.Header}" ToolTip="{Binding Handler.Description}" />
           </Grid>
-        </ui:CardExpander.Header>
+        </nui:NodeExpander.Header>
 
-        <Grid Margin="0">
+        <Grid Grid.Row="1" Margin="0">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -113,7 +113,7 @@
           </Grid>
         </Grid>
 
-      </ui:CardExpander>
+      </nui:NodeExpander>
     </Border>
   </Viewbox>
 </UserControl>

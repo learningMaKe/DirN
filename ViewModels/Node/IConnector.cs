@@ -14,6 +14,8 @@ namespace DirN.ViewModels.Node
 
     public interface IConnector:INodePasser,INodeData,IJsonSerialize
     {
+        public event Action LoadedCallback;
+
         public Color ConnectorColor { get; }
 
         public Brush ConnectorBrush { get; }

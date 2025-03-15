@@ -15,6 +15,9 @@
     <system:Double x:Key="EllipseSize">10</system:Double>
   </UserControl.Resources>
   <i:Interaction.Triggers>
+    <i:EventTrigger EventName="Loaded">
+      <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+    </i:EventTrigger>
     <i:EventTrigger EventName="MouseLeftButtonDown">
       <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>

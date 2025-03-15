@@ -22,6 +22,10 @@ namespace DirN.Utils.NgManager
 
         public ObservableCollection<MenuItemInfo> CanvasContextMenu { get; }
 
+        public string WorkFile { get; set; }
+
+        public event Action<string>? WorkFileChangedEvent;
+
         public void AddNode(INode node);
 
         public void AddCurve(ICurve curve);

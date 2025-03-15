@@ -17,11 +17,16 @@ namespace DirN.ViewModels
 
         public SWord SelectedStoredWord { get; set; } = new();
 
-        public INodeGraphicsManager NodeGraphicsManager { get; set; }
+        public bool RequireAsk { get; set; } = false;
+
+        public INodeGraphicsManager GraphicsManager { get; set; }
 
         public DelegateCommand TestCommand { get; set; }
         public DelegateCommand AddStoredWordCommand { get; set; }
         public AsyncDelegateCommand RemoveStoredWordCommand { get; set; }
+        public AsyncDelegateCommand ClearAllStoredWordsCommand { get; set; }
+
+        public AsyncDelegateCommand<SWord> RemoveSWordCommand { get; set; }
 
         public Action<bool>? StoredWordVisibilityChangedEvent { get; set; }
 
@@ -30,14 +35,55 @@ namespace DirN.ViewModels
             TestCommand = new DelegateCommand(Test);
             AddStoredWordCommand = new DelegateCommand(AddStoredWord);
             RemoveStoredWordCommand = new AsyncDelegateCommand(RemoveStoredWord);
+            ClearAllStoredWordsCommand = new AsyncDelegateCommand(ClearAllStoredWords);
+            RemoveSWordCommand = new AsyncDelegateCommand<SWord>(RemoveSWord);
 
-            NodeGraphicsManager = provider.Resolve<INodeGraphicsManager>();
             contentDialogService = provider.Resolve<IContentDialogService>();
+            GraphicsManager = provider.Resolve<INodeGraphicsManager>();
 
             EventAggregator.GetEvent<NodeGraphicsEvent.StoredWordVisibilityEvent>().Subscribe(OnStoredWordVisibilityChanged);
 
         }
 
+        private async Task RemoveSWord(SWord word)
+        {
+            if (!RequireAsk)
+            {
+                NodeGraphicsManager.Instance.RemoveSWord(word);
+                return;
+            }
+            ContentDialogResult result = await contentDialogService.ShowSimpleDialogAsync(new()
+            {
+                Title = "移除词汇 " + word.Word,
+                Content = "确定要移除吗？",
+                PrimaryButtonText = "确定",
+                CloseButtonText = "取消"
+            });
+            if (result == ContentDialogResult.Primary)
+            {
+                NodeGraphicsManager.Instance.RemoveSWord(word);
+            }
+        }
+
+        private async Task ClearAllStoredWords()
+        {
+            if (!RequireAsk)
+            {
+                NodeGraphicsManager.Instance.ClearAllSWords();
+                return;
+            }
+            ContentDialogResult result = await contentDialogService.ShowSimpleDialogAsync(new()
+            {
+                Title = "清空全部词汇",
+                Content = "确定要清空全部词汇吗？",
+                PrimaryButtonText = "确定",
+                CloseButtonText = "取消"
+            });
+            if (result == ContentDialogResult.Primary)
+            {
+                NodeGraphicsManager.Instance.ClearAllSWords();
+            }
+        }
 
         private void Test()
         {
@@ -51,11 +97,16 @@ namespace DirN.ViewModels
 
         private void AddStoredWord()
         {
-            NodeGraphicsManager.AddSWord();
+            NodeGraphicsManager.Instance.AddSWord();
         }
 
         private async Task RemoveStoredWord()
         {
+            if (!RequireAsk)
+            {
+                NodeGraphicsManager.Instance.RemoveSWord(SelectedStoredWord);
+                return;
+            }
             ContentDialogResult result = await contentDialogService.ShowSimpleDialogAsync(new()
             {
                 Title = "移除词汇 " + SelectedStoredWord.Word,
@@ -65,7 +116,7 @@ namespace DirN.ViewModels
             });
             if (result == ContentDialogResult.Primary)
             {
-                NodeGraphicsManager.RemoveSWord(SelectedStoredWord);
+                NodeGraphicsManager.Instance.RemoveSWord(SelectedStoredWord);
             }
         }
     }

@@ -22,7 +22,7 @@ namespace DirN.Utils.Events.EventType
 
         public class GetCanvasRelativePointArgs : EventArgs
         {
-            public UIElement? Element { get; set; }
+            public FrameworkElement? Element { get; set; }
             public Point ElementRelativePoint { get; set; }
             public Point CanvasRelativePoint { get; set; }
         }

@@ -48,5 +48,15 @@ namespace DirN.Views
             }
             StoredWordTranslateTransform.BeginAnimation(TranslateTransform.XProperty, animation);
         }
+
+        private void OnDragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+        {
+            SWordListView.Height = Math.Max(SWordListView.Height + e.VerticalChange, 100);
+        }
+
+        private void OnExpand(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+        {
+            SWordNodeExpander.Width = Math.Clamp(SWordNodeExpander.Width + e.HorizontalChange, 100.0, 600.0);
+        }
     }
 }

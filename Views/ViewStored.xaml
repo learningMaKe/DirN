@@ -6,6 +6,7 @@
   xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
   xmlns:local="clr-namespace:DirN.Views"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:nui="clr-namespace:DirN.UI.NodeExpander"
   xmlns:prism="http://prismlibrary.com/"
   xmlns:proxy="clr-namespace:DirN.Utils.BindingProxy"
   xmlns:system="clr-namespace:System;assembly=mscorlib"
@@ -21,72 +22,86 @@
   </UserControl.Resources>
   <Grid
     x:Name="StoredWordList"
-    Width="200"
+    MinWidth="200"
     HorizontalAlignment="Left"
     VerticalAlignment="Stretch">
     <Grid.RenderTransform>
       <TranslateTransform x:Name="StoredWordTranslateTransform" />
     </Grid.RenderTransform>
-    <ui:Card
-      Margin="5"
-      VerticalAlignment="Stretch"
-      VerticalContentAlignment="Top">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition />
+      <ColumnDefinition Width="5" />
+    </Grid.ColumnDefinitions>
 
-      <ScrollViewer>
-        <StackPanel CanVerticallyScroll="True">
-          <TextBlock Margin="5" Text="保留字" />
-          <ListBox
-            ItemsSource="{Binding NodeGraphicsManager.NodeDetail.SWords, Mode=OneWay}"
+    <nui:NodeExpander
+      x:Name="SWordNodeExpander"
+      Width="200"
+      MinWidth="200"
+      HorizontalAlignment="Left"
+      VerticalAlignment="Stretch"
+      HorizontalContentAlignment="Stretch"
+      VerticalContentAlignment="Stretch"
+      Background="{DynamicResource ButtonBackground}"
+      ClipToBounds="True"
+      ScrollViewer.CanContentScroll="True">
+      <nui:NodeExpander.Header>
+        <ui:DropDownButton Margin="7" Icon="{ui:SymbolIcon Symbol=Text16}">
+          <ui:DropDownButton.Flyout>
+            <ContextMenu>
+              <MenuItem
+                Header="是否询问"
+                IsCheckable="True"
+                IsChecked="{Binding RequireAsk}" />
+              <MenuItem
+                Command="{Binding ClearAllStoredWordsCommand}"
+                Header="清空"
+                Icon="{ui:SymbolIcon Symbol=Delete20}" />
+              <MenuItem
+                Command="{Binding AddStoredWordCommand}"
+                Header="添加"
+                Icon="{ui:SymbolIcon Symbol=Add20}" />
+            </ContextMenu>
+          </ui:DropDownButton.Flyout>
+          <ui:DropDownButton.Content>
+            <TextBlock Text="保留字" ToolTip="按T伸展 " />
+          </ui:DropDownButton.Content>
+        </ui:DropDownButton>
+      </nui:NodeExpander.Header>
+      <ScrollViewer VerticalScrollBarVisibility="Visible">
+        <StackPanel ScrollViewer.CanContentScroll="True">
+          <ui:ListView
+            x:Name="SWordListView"
+            Height="300"
+            MinHeight="100"
+            ItemsSource="{Binding GraphicsManager.NodeDetail.SWords, Mode=OneWay}"
             ScrollViewer.CanContentScroll="True"
+            ScrollViewer.VerticalScrollBarVisibility="Visible"
             SelectedItem="{Binding SelectedStoredWord, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <ListBox.ItemsPanel>
+            <ui:ListView.ItemsPanel>
               <ItemsPanelTemplate>
-                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <VirtualizingStackPanel
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  ScrollViewer.CanContentScroll="True" />
               </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemTemplate>
+            </ui:ListView.ItemsPanel>
+            <ui:ListView.ItemTemplate>
               <DataTemplate>
-                <Grid Background="Transparent">
+                <Grid Margin="10,0" Background="Transparent">
                   <Grid.InputBindings>
-                    <KeyBinding
-                      Key="F2"
-                      Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.SelectedStoredWord.EditCommand}"
-                      CommandParameter="{StaticResource True}" />
-                    <KeyBinding
-                      Key="Esc"
-                      Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.SelectedStoredWord.EditCommand}"
-                      CommandParameter="{StaticResource False}" />
-                    <MouseBinding Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.RemoveStoredWordCommand}" MouseAction="MiddleClick" />
+                    <MouseBinding
+                      Command="{Binding RelativeSource={RelativeSource AncestorType=local:ViewStored}, Path=DataContext.RemoveSWordCommand}"
+                      CommandParameter="{Binding}"
+                      MouseAction="MiddleClick" />
                   </Grid.InputBindings>
                   <Grid.ContextMenu>
                     <ContextMenu DataContext="{StaticResource DataContextProxy}">
                       <ui:MenuItem
-                        Command="{Binding Data.SelectedStoredWord.EditCommand}"
-                        CommandParameter="{StaticResource True}"
-                        Header="编辑"
-                        InputGestureText="F2">
-                        <MenuItem.InputBindings>
-                          <KeyBinding
-                            Key="F2"
-                            Command="{Binding Data.SelectedStoredWord.EditCommand}"
-                            CommandParameter="{StaticResource True}" />
-                        </MenuItem.InputBindings>
-                      </ui:MenuItem>
-                      <ui:MenuItem
                         Command="{Binding Data.RemoveStoredWordCommand}"
                         Header="删除"
-                        InputGestureText="Del">
-                        <MenuItem.InputBindings>
-                          <KeyBinding Key="Delete" Command="{Binding Data.RemoveStoredWordCommand}" />
-                        </MenuItem.InputBindings>
-                      </ui:MenuItem>
+                        InputGestureText="中键" />
                     </ContextMenu>
                   </Grid.ContextMenu>
-                  <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="LostFocus">
-                      <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.SelectedStoredWord.EditCommand}" CommandParameter="{StaticResource False}" />
-                    </i:EventTrigger>
-                  </i:Interaction.Triggers>
                   <Grid HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="20" />
@@ -97,32 +112,71 @@
                       VerticalAlignment="Center"
                       Glyph="{Binding Index}" />
                     <Grid Grid.Column="1">
-                      <TextBlock
-                        x:Name="StoredWordTextBlock"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="{Binding Word}" />
-                      <TextBox
-                        x:Name="StoredWordTextBox"
-                        HorizontalAlignment="stretch"
-                        VerticalAlignment="stretch"
-                        Text="{Binding Word, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding IsEditable, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                      <Grid.Resources>
+                        <Style TargetType="{x:Type TextBox}">
+                          <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+                          <Setter Property="CaretBrush" Value="{DynamicResource TextControlForeground}" />
+
+                          <Setter Property="Template">
+                            <Setter.Value>
+                              <ControlTemplate TargetType="{x:Type TextBox}">
+                                <Grid
+                                  Margin="{TemplateBinding Padding}"
+                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                  <ScrollViewer
+                                    x:Name="PART_ContentHost"
+                                    CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
+                                    HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                    IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                                    IsTabStop="{TemplateBinding ScrollViewer.IsTabStop}"
+                                    Style="{DynamicResource DefaultTextBoxScrollViewerStyle}"
+                                    TextElement.Foreground="{TemplateBinding Foreground}"
+                                    VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
+                                </Grid>
+                              </ControlTemplate>
+                            </Setter.Value>
+                          </Setter>
+                        </Style>
+                      </Grid.Resources>
+                      <TextBox x:Name="StoredWordTextBox" Text="{Binding Word, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                   </Grid>
                 </Grid>
               </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-
+            </ui:ListView.ItemTemplate>
+          </ui:ListView>
           <Button
             Margin="5"
             HorizontalAlignment="Stretch"
             Command="{Binding AddStoredWordCommand}"
             Content="{ui:SymbolIcon Symbol=Add20}" />
+          <Thumb
+            Height="3"
+            HorizontalAlignment="Stretch"
+            Cursor="ScrollNS"
+            DragDelta="OnDragDelta">
+            <Thumb.Template>
+              <ControlTemplate>
+                <Rectangle Fill="Transparent" />
+              </ControlTemplate>
+            </Thumb.Template>
+          </Thumb>
         </StackPanel>
       </ScrollViewer>
+    </nui:NodeExpander>
+    <Thumb
+      Grid.Column="1"
+      Width="5"
+      HorizontalAlignment="Right"
+      Cursor="ScrollWE"
+      DragDelta="OnExpand">
+      <Thumb.Template>
+        <ControlTemplate>
+          <Rectangle Fill="Transparent" />
+        </ControlTemplate>
+      </Thumb.Template>
+    </Thumb>
 
-    </ui:Card>
   </Grid>
 </UserControl>

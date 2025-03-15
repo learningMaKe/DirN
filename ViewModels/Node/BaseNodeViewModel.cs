@@ -16,7 +16,6 @@ using System.Windows.Input;
 namespace DirN.ViewModels.Node
 {
     [DebuggerDisplay("HashCode = {GetHashCode()}")]
-    [JsonConverter(typeof(NodeConverter))]
     public class BaseNodeViewModel : BindableBase,INode,IViewGetter
     {
         public bool IsSelected { get; set; }
@@ -184,7 +183,7 @@ namespace DirN.ViewModels.Node
 
         private void Loaded()
         {
-
+            OnPositionChanged();
         }
 
         private void OnHandlerTypeChanged()

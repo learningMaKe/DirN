@@ -38,9 +38,9 @@ namespace DirN.ViewModels.Node
 
         public IList<object?> InputDataGroup => Handler?.InputGroup.Select(x => x.Data).ToList() ?? [];
 
-        public IList<Guid> InputIds => Handler?.InputGroup.Select(x => x.Connector.Id).ToList() ?? [];
+        public IList<IConnector> InputConnectors => Handler?.InputGroup.Select(x => x.Connector).ToList() ?? [];
 
-        public IList<Guid> OutputIds => Handler?.OutputGroup.Select(x => x.Connector.Id).ToList() ?? [];
+        public IList<IConnector> OutputConnectors => Handler?.OutputGroup.Select(x => x.Connector).ToList() ?? [];
 
         public void Move(Vector delta);
 

@@ -21,8 +21,11 @@ namespace DirN.ViewModels.Node
 
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        public event Action? LoadedCallback;
+
         public DelegateCommand<MouseButtonEventArgs> MouseLeftButtonDownCommand { get;private set; }
-        
+        public DelegateCommand LoadedCommand { get; private set; }
+
         public IPointer PointerParent { get; set; }
 
         public Color ConnectorColor =>PointerParent.PointerConfig!.PointerColor;
@@ -50,6 +53,7 @@ namespace DirN.ViewModels.Node
         {
             this.PointerParent = parent;
             MouseLeftButtonDownCommand = new(MouseLeftButtonDown);
+            LoadedCommand = new(Loaded);
         }
 
         public abstract void RemoveLink(ICurve curve);
@@ -60,6 +64,12 @@ namespace DirN.ViewModels.Node
         public virtual void SetData(object? data) { }
 
         protected abstract void MakeLink();
+
+        protected virtual void Loaded()
+        {
+            LoadedCallback?.Invoke();
+            LoadedCallback = null;
+        }
 
         protected NodeGraphicsArgs.LinkArgs GetLinkArgs(ICurve linkCurve)
         {

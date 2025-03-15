@@ -49,7 +49,7 @@ namespace DirN.Utils.NgManager
                 TooltipManager.Instance.Tooltip(executionOrder[i], $"正在执行第{i + 1}步", TooltipType.Info);
                 try
                 {
-                    //executionOrder[i].DataFlow();
+                    executionOrder[i].DataFlow();
                 }
                 catch (Exception ex)
                 {
@@ -61,6 +61,16 @@ namespace DirN.Utils.NgManager
 
         }
 
+        public void ExecuteOrder()
+        {
+            if (LoopDetect()) return;
+            IList<INode> executionOrder = Nodes.GetExecutionOrderEx();
+            for (int i = 0; i < executionOrder.Count; i++)
+            {
+                TooltipManager.Instance.Tooltip(executionOrder[i], $"第{i + 1}步", TooltipType.Info);
+            }
+
+        }
         public void AlignNode(INode node, NodeAlignment alignment)
         {
             IList<INode> SelectedNodes = Nodes.SelectedNodes;
@@ -137,7 +147,7 @@ namespace DirN.Utils.NgManager
         {
             SWords.Add(new SWord()
             {
-                Word = DefaultText,
+                Word = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 Index = SWords.Count
             });
         }
@@ -152,6 +162,11 @@ namespace DirN.Utils.NgManager
                 SWords[i].Index = i;
             }
 
+        }
+
+        public void ClearAllSWords()
+        {
+            SWords.Clear();
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using DirN.Utils.CommandLine;
 using DirN.Utils.Events.EventType;
+using DirN.Utils.NgManager;
 using DryIoc.FastExpressionCompiler.LightExpression;
 using Newtonsoft.Json.Linq;
 using Prism.Events;
+using PropertyChanged;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -24,6 +26,16 @@ namespace DirN.Utils.DirManager
         private readonly ApplicationParameter applicationParameter;
 
         public static string UserProfilePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        public static string JsonHome => Path.Combine(Environment.CurrentDirectory,"Nodes");
+
+        static DirectoryManager()
+        {
+            if (!Directory.Exists(JsonHome))
+            {
+                Directory.CreateDirectory(JsonHome);
+            }
+        }
 
         private string workDirectory = UserProfilePath;
 
@@ -51,6 +63,7 @@ namespace DirN.Utils.DirManager
 
         public ObservableCollection<string> PreviewFiles { get; set; } = [];
 
+       
         public DirectoryManager(IContainerProvider containerProvider):base(containerProvider)
         {
             applicationParameter = containerProvider.Resolve<ApplicationParameter>();

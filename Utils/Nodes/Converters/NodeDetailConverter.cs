@@ -1,5 +1,4 @@
-﻿
-using DirN.Utils.NgManager;
+﻿using DirN.Utils.NgManager;
 using DirN.Utils.NgManager.Curves;
 using DirN.ViewModels.Node;
 using Fclp.Internals.Extensions;
@@ -21,7 +20,7 @@ namespace DirN.Utils.Nodes.Converters
         // ToDo: 记得测试
         public override NodeDetail? ReadJson(JsonReader reader, Type objectType, NodeDetail? existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            Dictionary<Guid,IConnector> connectors = [];
+            Dictionary<int,IConnector> connectors = [];
             NodeDetail nodeDetail = new();
             #if !OUT
             JObject jObject = JObject.Load(reader);
@@ -53,14 +52,12 @@ namespace DirN.Utils.Nodes.Converters
                 {
                     Point? position = nodeObject["Position"]?.ToObject<Point>();
                     HandlerType? handlerType = nodeObject["HandlerType"]?.ToObject<HandlerType>();
-                    Guid? guid = nodeObject["Guid"]?.ToObject<Guid>();
 
                     BaseNodeViewModel node = new(); 
-                    if (position != null && handlerType != null && guid != null)
+                    if (position != null && handlerType != null)
                     {
                         node.Position = position.Value;
                         node.HandlerType = handlerType.Value;
-                        node.Id = guid.Value;
                     }
                     JArray? inputIds = (JArray?)nodeObject["InputIds"];
                     JArray? outputIds = (JArray?)nodeObject["OutputIds"];
@@ -69,7 +66,7 @@ namespace DirN.Utils.Nodes.Converters
                     {
                         for(int i = 0; i < inputIds.Count; i++)
                         {
-                            Guid connectorId = Guid.Parse(inputIds[i].ToString());
+                            int connectorId = int.Parse(inputIds[i].ToString());
                             connectors.Add(connectorId, node.Handler!.InputGroup[i].Connector);
                         }
                     }
@@ -77,7 +74,7 @@ namespace DirN.Utils.Nodes.Converters
                     {
                         for(int i = 0; i < outputIds.Count; i++)
                         {
-                            Guid connectorId = Guid.Parse(outputIds[i].ToString());
+                            int connectorId = int.Parse(outputIds[i].ToString());
                             connectors.Add(connectorId, node.Handler!.OutputGroup[i].Connector);
                         }
                     }
@@ -85,11 +82,19 @@ namespace DirN.Utils.Nodes.Converters
                     {
                         for (int i = 0; i < inputData.Count; i++)
                         {
-                            object d = System.Convert.ChangeType(inputData[i], node.Handler!.InputGroup[i].PointerType);
-                            node.Handler.InputGroup[i].Data = d;
+                            try
+                            {
+                                object d = System.Convert.ChangeType(inputData[i], node.Handler!.InputGroup[i].PointerType);
+                                node.Handler.InputGroup[i].Data = d;
+                            }
+                            catch
+                            {
+                                continue;
+                            }
                         }
                     }
 
+                    nodeDetail.Nodes.Add(node);
                 }
             }
 
@@ -100,16 +105,20 @@ namespace DirN.Utils.Nodes.Converters
                 {
                     string? startIdStr= curveObject["Starter"]?.ToObject<string>();
                     if (string.IsNullOrEmpty(startIdStr)) continue;
-                    Guid startId = Guid.Parse(startIdStr);
+                    int startId = int.Parse(startIdStr);
                     string? endIdStr = curveObject["Ender"]?.ToObject<string>();
                     if (string.IsNullOrEmpty(endIdStr)) continue;
-                    Guid endId = Guid.Parse(endIdStr);
+                    int endId = int.Parse(endIdStr);
                     if(connectors.TryGetValue(startId, out IConnector? startConnector)&&connectors.TryGetValue(endId, out IConnector? endConnector))
                     {
-                        BezierCurve curve = new()
+                        BezierCurve curve = new();
+                        startConnector.LoadedCallback += () =>
                         {
-                            Starter = startConnector,
-                            Ender = endConnector
+                            curve.Starter = startConnector;
+                        };
+                        endConnector.LoadedCallback += () =>
+                        {
+                            curve.Ender = endConnector;
                         };
                         nodeDetail.BezierCurves.Add(curve);
                     }
@@ -137,13 +146,70 @@ namespace DirN.Utils.Nodes.Converters
                 return;
             }
 
+            Dictionary<IConnector, int> connectorMap = [];
+
             writer.WriteStartObject();
             writer.WritePropertyName(nameof(value.SWords));
             serializer.Serialize(writer, value.SWords);
+
+            // Write Nodes
             writer.WritePropertyName(nameof(value.Nodes));
-            serializer.Serialize(writer, value.Nodes);
+            writer.WriteStartArray();
+            int connectorIndex = 0;
+            foreach (var node in value.Nodes)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("Position");
+                serializer.Serialize(writer, node.Position);
+                writer.WritePropertyName("HandlerType");
+                writer.WriteValue(node.HandlerType.ToString());
+                writer.WritePropertyName("InputData");
+                writer.WriteStartArray();
+                foreach (var data in node.InputDataGroup)
+                {
+                    serializer.Serialize(writer, data);
+                }
+                writer.WriteEndArray();
+                writer.WritePropertyName("InputIds");
+                writer.WriteStartArray();
+                foreach (var ic in node.InputConnectors)
+                {
+                    writer.WriteValue(connectorIndex);
+                    connectorMap.Add(ic, connectorIndex);
+                    connectorIndex++;
+                }
+                writer.WriteEndArray();
+                writer.WritePropertyName("OutputIds");
+                writer.WriteStartArray();
+                foreach (var oc in node.OutputConnectors)
+                {
+                    writer.WriteValue(connectorIndex);
+                    connectorMap.Add(oc, connectorIndex);
+                    connectorIndex++;
+                }
+                writer.WriteEndArray();
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
+
+            // Write BezierCurves
             writer.WritePropertyName(nameof(value.BezierCurves));
-            serializer.Serialize(writer, value.BezierCurves);
+            writer.WriteStartArray();
+            foreach (var curve in value.BezierCurves)
+            {
+                writer.WriteStartObject();
+                if (curve.Starter is not null && curve.Ender is not null)
+                {
+                    writer.WritePropertyName("Starter");
+                    connectorMap.TryGetValue(curve.Starter, out int si);
+                    writer.WriteValue(si);
+                    writer.WritePropertyName("Ender");
+                    connectorMap.TryGetValue(curve.Ender, out int ei);
+                    writer.WriteValue(ei);
+                }
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
             writer.WriteEndObject();
         }
     }

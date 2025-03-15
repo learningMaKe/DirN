@@ -44,27 +44,67 @@
       Grid.Column="2"
       Margin="5"
       Orientation="Horizontal">
-      <Button
-        Margin="5,0"
-        Command="{Binding TestCommand}"
-        Content="{ui:SymbolIcon Symbol=Bug24}" />
-      <Button
-        Margin="5,0"
-        Command="{Binding ExecuteCommand}"
-        Content="{ui:SymbolIcon Symbol=Play20}" />
+      <StackPanel.Resources>
+        <Style BasedOn="{StaticResource DefaultUiDropDownButtonStyle}" TargetType="{x:Type ui:DropDownButton}">
+          <Setter Property="Margin" Value="5,0" />
+        </Style>
+      </StackPanel.Resources>
+      <ui:DropDownButton Content="运行" Icon="{ui:SymbolIcon Symbol=Play24}">
+        <ui:DropDownButton.Flyout>
+          <ContextMenu>
+            <ui:MenuItem
+              Command="{Binding ExecuteCommand}"
+              Header="运行"
+              Icon="{ui:SymbolIcon Symbol=Play20}" />
+            <ui:MenuItem
+              Command="{Binding ExecuteOrderCommand}"
+              Header="运行顺序"
+              Icon="{ui:SymbolIcon Symbol=ArrowSort20}" />
+            <ui:MenuItem
+              Command="{Binding TestCommand}"
+              Header="测试"
+              Icon="{ui:SymbolIcon Symbol=Bug20}" />
 
-      <ToggleButton
-        Margin="5,0"
-        Content="{ui:SymbolIcon Symbol=PreviewLink20}"
-        IsChecked="{Binding PreviewerManager.PreviewerVisibility, Mode=TwoWay}"
-        ToolTip="预览" />
 
-
-      <Button
-        Margin="5,0"
-        Command="{Binding BrowseCommand}"
-        Content="{ui:SymbolIcon Symbol=SelectObject20}"
-        ToolTip="浏览文件夹" />
+          </ContextMenu>
+        </ui:DropDownButton.Flyout>
+      </ui:DropDownButton>
+      <ui:DropDownButton Content="预览" Icon="{ui:SymbolIcon Symbol=PreviewLink20}">
+        <ui:DropDownButton.Flyout>
+          <ContextMenu>
+            <ui:MenuItem
+              Header="结果预览"
+              IsCheckable="True"
+              IsChecked="{Binding PreviewerManager.PreviewerVisibility, Mode=TwoWay}" />
+          </ContextMenu>
+        </ui:DropDownButton.Flyout>
+      </ui:DropDownButton>
+      <ui:DropDownButton Content="操作" Icon="{ui:SymbolIcon Symbol=SelectObject20}">
+        <ui:DropDownButton.Flyout>
+          <ContextMenu>
+            <ui:MenuItem
+              Command="{Binding OpenJsonHomeCommand}"
+              Header="打开节点集"
+              Icon="{ui:SymbolIcon Symbol=Open20}" />
+            <ui:MenuItem
+              Command="{Binding SaveNodeCommand}"
+              Header="保存节点"
+              Icon="{ui:SymbolIcon Symbol=Save20}" />
+            <ui:MenuItem
+              Command="{Binding SaveAsNodeCommand}"
+              Header="另存节点"
+              Icon="{ui:SymbolIcon Symbol=SaveCopy20}" />
+            <ui:MenuItem
+              Command="{Binding JsonSelectCommand}"
+              Header="选择节点文件"
+              Icon="{ui:SymbolIcon Symbol=Document20}" />
+            <ui:MenuItem
+              Command="{Binding BrowseCommand}"
+              Header="选择工作文件夹"
+              Icon="{ui:SymbolIcon Symbol=Folder20}" />
+          </ContextMenu>
+        </ui:DropDownButton.Flyout>
+      </ui:DropDownButton>
     </StackPanel>
   </Grid>
 </UserControl>

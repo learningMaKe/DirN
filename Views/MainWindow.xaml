@@ -20,6 +20,9 @@
   WindowBackdropType="Mica"
   mc:Ignorable="d">
   <i:Interaction.Triggers>
+    <i:EventTrigger EventName="Loaded">
+      <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+    </i:EventTrigger>
     <i:EventTrigger EventName="Closing">
       <i:InvokeCommandAction Command="{Binding CloseCommand}" PassEventArgsToCommand="True" />
     </i:EventTrigger>

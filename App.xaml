@@ -11,6 +11,7 @@
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Resources/Theme/Dark.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Resources/Wpf.Ui.xaml" />
         <ResourceDictionary Source="/Resources/ConverterDictionary.xaml" />
+        <ResourceDictionary Source="/UI/DirN.UI.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

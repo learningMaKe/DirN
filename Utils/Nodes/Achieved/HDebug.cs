@@ -12,7 +12,7 @@ namespace DirN.Utils.Nodes.Achieved
     [HDes("调试","#F060","调试节点")]
     public class HDebug : TypedHandler
     {
-        protected override Type[] InputTypes => [typeof(object)];
+        protected override Type[] InputTypes => [typeof(string)];
 
         protected override Type[] OutputTypes => [];
 

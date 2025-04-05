@@ -8,7 +8,10 @@ using System.Windows.Media;
 
 namespace DirN.Utils.Nodes.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Enum)]
+    /// <summary>
+    /// 描述 <seealso cref="PointerConfig"/>
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Enum|AttributeTargets.Property)]
     public class HPDesAttribute:Attribute
     {
         public HPDesAttribute(string Header,  bool UseConnector = true, PointerControlType ControlType = PointerControlType.PAny, string PointerColor = "Black")
@@ -33,5 +36,31 @@ namespace DirN.Utils.Nodes.Attributes
         public bool UseConnector = true;
         public Color PointerColor = Colors.Black;
         public PointerControlType ControlType = PointerControlType.PAny;
+    }
+
+    /// <summary>
+    /// 用于描述 输入 的 <see cref="PointerConfig"/>
+    /// </summary>
+    public class HPIDesAttribute : HPDesAttribute
+    {
+        public int Order = 0;
+
+        public HPIDesAttribute(int order, string Header, bool UseConnector = true, PointerControlType ControlType = PointerControlType.PAny, string PointerColor = "Black"):base(Header, UseConnector, ControlType, PointerColor)
+        {
+            Order = order;
+        }
+
+        public HPIDesAttribute(int order, string Header, string Description = "", bool UseConnector = true, PointerControlType ControlType = PointerControlType.PAny, string PointerColor = "Black") : base(Header, Description, UseConnector, ControlType, PointerColor)
+        {
+            Order = order;
+        }
+    }
+
+    /// <summary>
+    ///  用于描述 输出 的 <see cref="PointerConfig"/>
+    /// </summary>
+    public class HPODesAttribute(int order, string Header, string Description = "", string PointerColor = "Black") : HPDesAttribute(Header, Description, false, PointerControlType.PAny, PointerColor)
+    {
+        public int Order = order;
     }
 }

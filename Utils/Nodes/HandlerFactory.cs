@@ -11,12 +11,13 @@ namespace DirN.Utils.Nodes
 {
     public static class HandlerFactory
     {
-        public static INodeHandler Create<THandler>(INode parent) where THandler : TypedHandler, new()
+        public static INodeHandler Create<THandler>(INode parent) where THandler : BaseHandler, new()
         {
             if (parent is null)
             {
                 throw new NullReferenceException("Parent cannot be null");
             }
+
             THandler handler = new()
             {
                 Parent = parent
@@ -25,7 +26,7 @@ namespace DirN.Utils.Nodes
             return handler;
         }
 
-        public static HandlerConfig CreateConfig<THandler>(string Header) where THandler : TypedHandler, new()
+        public static HandlerConfig CreateConfig<THandler>(string Header) where THandler : BaseHandler, new()
         {
             HandlerConfig config = new(Header, Create<THandler>);
             return config;
@@ -37,11 +38,11 @@ namespace DirN.Utils.Nodes
         /// <typeparam name="THandler"></typeparam>
         /// <param name="Header"></param>
         /// <returns></returns>
-        public static HandlerConfig CC<THandler>(string Header) where THandler : TypedHandler, new()=> CreateConfig<THandler>(Header);
+        public static HandlerConfig CC<THandler>(string Header) where THandler : BaseHandler, new()=> CreateConfig<THandler>(Header);
     
         public static HandlerConfig? CC(Type type, string Header,string description = "")
         {
-            if (!typeof(TypedHandler).IsAssignableFrom(type))
+            if (!typeof(BaseHandler).IsAssignableFrom(type))
             {
                 return null;
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.Nodes.Datas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,9 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => [typeof(TOutput)];
 
-        protected override IList<object?> Handle(IList<object> input)
+        protected override IList<DataContainer> Handle(IList<DataContainer> input)
         {
-            return [Output()];
+            return [new (Output())];
         }
 
         protected abstract TOutput Output();

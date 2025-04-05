@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using DirN.ViewModels.Node;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace DirN.ViewModels.PointerControl
 {
     public abstract class PViewModel:BindableBase,IPointerControl 
     {
+
+
         public IPContainer? Parent { get; set; }
         public IPointer? PointerParent { get; set; }
         public PointerConfig? Config { get; set; }
@@ -28,14 +31,15 @@ namespace DirN.ViewModels.PointerControl
 
         }
 
-        public object? Data
+        public DataContainer Data
         {
             get => GetData();
             set => SetData(value);
         }
 
-        public abstract object? GetData();
+        public abstract DataContainer GetData();
 
-        public virtual void SetData(object? data) { }
+        public virtual void SetData(DataContainer data) { }
+
     }
 }

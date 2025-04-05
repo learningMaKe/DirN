@@ -204,11 +204,7 @@ namespace DirN.ViewModels.Node
 
         private void OnTestOutput()
         {
-            string outputs = string.Join("\n", Handler!.HandleData() ?? ["No output"]);
-            if (!string.IsNullOrEmpty(outputs))
-            {
-                MessageBox.Show(outputs);
-            }
+
         }
 
         private void OnDataFlow()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.Nodes.Datas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace DirN.ViewModels.PointerControl
 {
     public class PFileInfoViewModel : PViewModel
     {
-        public override object? GetData()
+        public override DataContainer GetData()
         {
             throw new NotImplementedException();
         }

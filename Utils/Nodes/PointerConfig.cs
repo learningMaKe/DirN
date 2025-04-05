@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Copys;
+using DirN.Utils.Nodes.Attributes;
 using DirN.Utils.Validation;
 using DirN.ViewModels.Node;
 using DirN.ViewModels.PointerControl;
@@ -28,11 +29,22 @@ namespace DirN.Utils.Nodes
 
         public Brush PointerBrush { get;private set; } = Brushes.Green;
 
-        public PointerControlType ControlType { get; init; } = PointerControlType.PInt;
+        public PointerControlType ControlType { get; set; } = PointerControlType.PInt;
 
-        private void OnPointerColorChanged()
+        public void Init(HPDesAttribute attribute)
         {
-            PointerBrush = new SolidColorBrush(PointerColor);
+            Header = attribute.Header;
+            Description = attribute.Description;
+            PointerColor = attribute.PointerColor;
+            ControlType = attribute.ControlType;
+            UseConnector = attribute.UseConnector;
+        }
+
+        public static PointerConfig Create(HPDesAttribute attribute)
+        {
+            PointerConfig pointerConfig = new();
+            pointerConfig.Init(attribute);
+            return pointerConfig;
         }
 
         public PointerConfig Copy()
@@ -51,6 +63,11 @@ namespace DirN.Utils.Nodes
         object ICopyable.Copy()
         {
             return Copy();
+        }
+
+        private void OnPointerColorChanged()
+        {
+            PointerBrush = new SolidColorBrush(PointerColor);
         }
     }
 

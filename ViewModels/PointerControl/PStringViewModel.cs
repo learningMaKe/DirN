@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.NgManager;
+using DirN.Utils.Nodes.Datas;
 using DirN.ViewModels.Node;
 using DirN.Views.PointerControl;
 using System;
@@ -12,30 +13,46 @@ namespace DirN.ViewModels.PointerControl
 {
     public class PStringViewModel:PViewModel
     {
+        private string word = string.Empty;
+
         public SWord SelectedWord { get; set; } = new();
 
-        public ObservableCollection<SWord> StoredWords { get; set; }
+        public NodeGraphicsManager NodeGraphicsManager { get; set; }
+
+        public DelegateCommand LoadedCommand { get; set; }
 
         public PStringViewModel()
         {
-            StoredWords = NodeGraphicsManager.Instance.NodeDetail.SWords;
+            LoadedCommand = new DelegateCommand(Loaded);
+            NodeGraphicsManager = NodeGraphicsManager.Instance;
         }
 
         protected override void Init()
         {
-
+            
         }
 
-        public override string? GetData()
+        public override DataContainer GetData()
         {
-            return SelectedWord.Word;
+            return new(SelectedWord.Word);
         }
 
-        public override void SetData(object? data)
+        public override void SetData(DataContainer data)
         {
-            if (data is string word)
+            string? word = data.GetData<string>();
+            if(string.IsNullOrEmpty(word)) return;
+            this.word = word;
+            Loaded();
+        }
+
+        private void Loaded()
+        {
+            foreach (var sword in NodeGraphicsManager.NodeDetail.SWords)
             {
-                SelectedWord = new() { Word = word, Index = 0 };
+                if (sword.Word == word)
+                {
+                    SelectedWord = sword;
+                }
             }
         }
     }

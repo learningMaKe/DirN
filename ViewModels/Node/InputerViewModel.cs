@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using DirN.ViewModels.PointerControl;
 using System;
 using System.Collections.Generic;
@@ -42,9 +43,10 @@ namespace DirN.ViewModels.Node
             UseConnector = config.UseConnector;
         }
 
-        protected override object? GetData()
+        protected override DataContainer GetData()
         {
-            object? data = AcceptExternal ? InputConnector.Data : PointerContainer.Data;
+            DataContainer data = AcceptExternal ? InputConnector.Data : PointerContainer.Data;
+            
             if (PointerConfig is null) return data;
 
             if (PointerConfig.Validate is null) return data;
@@ -56,7 +58,7 @@ namespace DirN.ViewModels.Node
             throw new ArgumentException("校验失败");
         }
 
-        protected override void SetData(object? data)
+        protected override void SetData(DataContainer data)
         {
             if (data is null) return;
             if (AcceptExternal)

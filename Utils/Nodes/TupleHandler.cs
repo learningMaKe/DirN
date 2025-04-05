@@ -1,4 +1,5 @@
-﻿using DirN.Utils.Nodes.Dynamics;
+﻿using DirN.Utils.Nodes.Datas;
+using DirN.Utils.Nodes.Dynamics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,11 @@ namespace DirN.Utils.Nodes
         protected override Type[] InputTypes => typeof(TInput).GetGenericArguments();
         protected override Type[] OutputTypes => typeof(TOutput).GetGenericArguments();
 
-        protected override IList<object?> Handle(IList<object> input)
+        protected override IList<DataContainer> Handle(IList<DataContainer> input)
         {
             TInput inputTuple = GenericBuilder.MakeTuple<TInput>([.. input]) ?? throw new ArgumentException("Input is not of type TInput");
             TOutput outputTuple = HandleTuple(inputTuple);
-            return GenericBuilder.UnpackTuple<TOutput>(outputTuple);
+            return [..GenericBuilder.UnpackTuple<TOutput>(outputTuple).Select(x=>new DataContainer(x))];
         }
 
         protected abstract TOutput HandleTuple(TInput input);

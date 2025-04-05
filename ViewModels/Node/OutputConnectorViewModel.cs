@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirN.Utils.Nodes.Datas;
 
 namespace DirN.ViewModels.Node
 {
@@ -27,13 +28,14 @@ namespace DirN.ViewModels.Node
 
         }
 
-        public override void SetData(object? data)
+        public override void SetData(DataContainer data)
         {
             foreach (ICurve curve in CurveGroup)
             {
                 curve.Data = data;
             }
         }
+
         // ToDo: 需要检查是否有重复的连接
         public override void AddLink(ICurve curve)
         {

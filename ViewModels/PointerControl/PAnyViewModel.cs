@@ -1,4 +1,5 @@
-﻿using DirN.Views.PointerControl;
+﻿using DirN.Utils.Nodes.Datas;
+using DirN.Views.PointerControl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,9 @@ namespace DirN.ViewModels.PointerControl
 
         }
 
-        public override object? GetData()
+        public override DataContainer GetData()
         {
-            return "No Data";
+            return new DataContainer("No Data");
         }
     }
 }

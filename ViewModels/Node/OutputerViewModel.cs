@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,23 @@ namespace DirN.ViewModels.Node
             OutputConnector.UpdateLink();
         }
 
+
         public override void CutLink()
         {
             OutputConnector.CutLink();
         }
 
-        protected override void SetData(object? data)
+        /// <summary>
+        /// 输出节点不存储数据，因此此处不实现
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        protected override DataContainer GetData()
+        {
+            return Connector.Data;
+        }
+
+        protected override void SetData(DataContainer data)
         {
             if (PointerConfig?.Validate?.Invoke(data) == false) throw new ArgumentException("校验失败");
 

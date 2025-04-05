@@ -1,4 +1,5 @@
-﻿using DirN.Views.PointerControl;
+﻿using DirN.Utils.Nodes.Datas;
+using DirN.Views.PointerControl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace DirN.ViewModels.PointerControl
 {
     public class PIntViewModel:PViewModel
     {
-        public override string GetData()
+        public override DataContainer GetData()
         {
-            return "O,Hello";
+            return new("O,Hello");
         }
 
     }

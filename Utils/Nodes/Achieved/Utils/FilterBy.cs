@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace DirN.Utils.Nodes.Achieved.Utils
 {
+    /// <summary>
+    /// 描述 <seealso cref="PointerConfig"/>
+    /// </summary>
     [HPDes("筛选方式","通过文件名或扩展名进行过滤",  false,PointerControlType.PEnum)]
     public enum FilterBy
     {

@@ -1,5 +1,6 @@
 ﻿using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using DirN.Utils.Seralizes;
 using DirN.Utils.Tooltips;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace DirN.ViewModels.Node
 
         public IList<ICurve> Linked => [.. Input.Concat(Output).Distinct()];
 
-        public IList<object?> InputDataGroup => Handler?.InputGroup.Select(x => x.Data).ToList() ?? [];
+        public IList<DataContainer> InputDataGroup => Handler?.InputGroup.Select(x => x.Data).ToList() ?? [];
 
         public IList<IConnector> InputConnectors => Handler?.InputGroup.Select(x => x.Connector).ToList() ?? [];
 

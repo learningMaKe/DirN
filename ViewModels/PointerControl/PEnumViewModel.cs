@@ -1,13 +1,11 @@
 ﻿using DirN.Utils.Attirubutes;
+using DirN.Utils.Nodes.Datas;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Intrinsics.X86;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DirN.ViewModels.PointerControl
 {
@@ -22,17 +20,17 @@ namespace DirN.ViewModels.PointerControl
 
         public string SelectedItem { get; set; } = string.Empty;
 
-        public override object? GetData()
+        public override DataContainer GetData()
         {
-            if (SelectedItem == string.Empty) return null;
+            if (SelectedItem == string.Empty) return new(null);
             if(enumValues.TryGetValue(PointerType, out Dictionary<string, object>? existValues))
             {
                 if(existValues.TryGetValue(SelectedItem, out object? value))
                 {
-                    return value;
+                    return new(value);
                 }
             }
-            return null;
+            return new(null);
         }
 
         protected override void Init()

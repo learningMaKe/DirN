@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.Nodes.Datas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,18 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => [typeof(TOutput)];
 
-        protected override IList<object?> Handle(IList<object> input)
+        protected override IList<DataContainer> Handle(IList<DataContainer> input)
         {
             if (input.Count != 1)
             {
                 throw new ArgumentException("DecoratorHandler can only handle one input");
             }
-
-            return [.. input.Cast<TInput>().Select(x => (object?)Decorate(x)).Cast<object?>()];
+            TInput data = input[0].GetData<TInput>();
+            if (data == null)
+            {
+                return [new DataContainer(null)];
+            }
+            return [new DataContainer(Decorate(data))];
         }
 
         protected abstract TOutput? Decorate(TInput input);

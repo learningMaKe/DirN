@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirN.Utils.Nodes.Datas;
 
 namespace DirN.ViewModels.Node
 {
@@ -29,9 +30,11 @@ namespace DirN.ViewModels.Node
 
         }
 
-        public override object? GetData()
+        public override DataContainer GetData()
         {
-            return InputCurve?.Data;
+            if(InputCurve == null) throw new NullReferenceException("InputCurve is null");
+
+            return InputCurve.Data;
         }
 
         public override void AddLink(ICurve curve)

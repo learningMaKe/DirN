@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.Nodes.Datas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,9 @@ namespace DirN.ViewModels.PointerControl
     {
         public bool IsChecked { get; set; } = false;
 
-        public override object? GetData()
+        public override DataContainer GetData()
         {
-            return IsChecked;
+            return new DataContainer(IsChecked);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DirN.Utils.NgManager;
 using DirN.Utils.NgManager.Curves;
+using DirN.Utils.Nodes.Datas;
 using DirN.ViewModels.Node;
 using Fclp.Internals.Extensions;
 using Newtonsoft.Json;
@@ -40,7 +41,6 @@ namespace DirN.Utils.Nodes.Converters
                         };
                         nodeDetail.SWords.Add(sword);
                     }
-
                 }
             }
             Debug.WriteLine(string.Join("\n", [.. nodeDetail.SWords.Select(x => x.Word + " " + x.Index)]));
@@ -84,8 +84,11 @@ namespace DirN.Utils.Nodes.Converters
                         {
                             try
                             {
-                                object d = System.Convert.ChangeType(inputData[i], node.Handler!.InputGroup[i].PointerType);
-                                node.Handler.InputGroup[i].Data = d;
+                                DataContainer? dc = serializer.Deserialize<DataContainer>(inputData[i].CreateReader());
+                                if (dc != null)
+                                {
+                                    node.Handler!.InputGroup[i].Data = dc;
+                                }
                             }
                             catch
                             {

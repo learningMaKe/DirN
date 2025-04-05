@@ -2,6 +2,7 @@
 using DirN.Utils.Extension;
 using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using DirN.Views.Node;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -13,7 +14,7 @@ namespace DirN.ViewModels.Node
     {
         private Connector? connector;
 
-        public object? Data
+        public DataContainer Data
         {
             get => GetData();
             set => SetData(value);
@@ -60,8 +61,8 @@ namespace DirN.ViewModels.Node
         public abstract void AddLink(ICurve curve);
         public abstract void UpdateLink();
         public abstract void CutLink();
-        public virtual object? GetData() { return null; }
-        public virtual void SetData(object? data) { }
+        public virtual DataContainer GetData() { return new(null); }
+        public virtual void SetData(DataContainer data) { }
 
         protected abstract void MakeLink();
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.Nodes.Datas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace DirN.ViewModels.Node
 {
     public interface INodeData
     {
-        public object? Data { get; set; }
+        public DataContainer Data { get; set; }
     }
 }

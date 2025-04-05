@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 namespace DirN.Utils.Attirubutes
 {
     [AttributeUsage(AttributeTargets.All)]
-    public class DesAttribute(string des):Attribute
+    public class DesAttribute(string des) : Attribute
     {
         public string Description { get; set; } = des;
     }
+
+    
 }

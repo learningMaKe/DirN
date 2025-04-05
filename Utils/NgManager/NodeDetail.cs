@@ -1,4 +1,5 @@
-﻿using DirN.Utils.Extension;
+﻿#define Catch
+using DirN.Utils.Extension;
 using DirN.Utils.NgManager.Curves;
 using DirN.Utils.Nodes.Converters;
 using DirN.Utils.Tooltips;
@@ -47,15 +48,19 @@ namespace DirN.Utils.NgManager
             for (int i = 0; i < executionOrder.Count; i++)
             {
                 TooltipManager.Instance.Tooltip(executionOrder[i], $"正在执行第{i + 1}步", TooltipType.Info);
+#if !Catch
                 try
                 {
+#endif
                     executionOrder[i].DataFlow();
+#if !Catch
                 }
                 catch (Exception ex)
                 {
                     executeError = true;
                     TooltipManager.Instance.Tooltip(executionOrder[i], $"执行失败：{ex.Message}", TooltipType.Error);
                 }
+#endif
                 if (executeError) break;
             }
 
@@ -71,6 +76,7 @@ namespace DirN.Utils.NgManager
             }
 
         }
+
         public void AlignNode(INode node, NodeAlignment alignment)
         {
             IList<INode> SelectedNodes = Nodes.SelectedNodes;

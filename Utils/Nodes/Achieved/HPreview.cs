@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Nodes.Attributes;
+using DirN.Utils.Nodes.Datas;
 using DirN.Utils.Tooltips;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace DirN.Utils.Nodes.Achieved
 
         protected override Type[] OutputTypes => [];
 
-        protected override IList<object?> Handle(IList<object> input)
+        protected override IList<DataContainer> Handle(IList<DataContainer> input)
         {
-            if (input.Count == 1 && input[0] is string str)
+            if (input.Count == 1 && input[0].GetData<string>() is string str)
             {
                 TooltipManager.Instance.Tooltip(this.Parent!, str);
             }

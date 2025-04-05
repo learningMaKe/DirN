@@ -18,7 +18,6 @@ namespace DirN.Utils.Nodes.Maps
     {
         public void Create(Dictionary<Type, PointerConfig> source)
         {
-
             source.Set(typeof(object), new PointerConfig()
             {
                 Header = "任意类型",
@@ -71,14 +70,7 @@ namespace DirN.Utils.Nodes.Maps
             {
                 HPDesAttribute? attribute = type.GetCustomAttribute<HPDesAttribute>();
                 if (attribute == null) continue;
-                source.Set(type, new PointerConfig()
-                {
-                    Header = attribute.Header,
-                    Description = attribute.Description,
-                    PointerColor = attribute.PointerColor,
-                    ControlType = attribute.ControlType,
-                    UseConnector = attribute.UseConnector,
-                });
+                source.Set(type, PointerConfig.Create(attribute));
             }
 
         }

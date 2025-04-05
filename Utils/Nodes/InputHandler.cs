@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DirN.Utils.Nodes.Datas;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,9 @@ namespace DirN.Utils.Nodes
 
         protected override Type[] OutputTypes => [];
 
-        protected override IList<object?> Handle(IList<object> input)
+        protected override IList<DataContainer> Handle(IList<DataContainer> input)
         {
-            TInput? inputValue = (TInput?)input[0] ?? throw new ArgumentException("Input value is null");
+            TInput? inputValue = input[0].GetData<TInput>() ?? throw new ArgumentException("Input value is null");
             Input(inputValue);
             return [];
         }

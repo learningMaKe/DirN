@@ -19,5 +19,14 @@ namespace DirN.ViewModels.PointerControl
             };
             return view;
         }
+
+        public static UserControl Create(Type viewType, Type viewModelType)
+        {
+            IPointerControl? vm = (IPointerControl?)Activator.CreateInstance(viewModelType) ?? throw new ArgumentException("ViewModel type must implement IPointerControl interface.");
+            UserControl? view = (UserControl?)Activator.CreateInstance(viewType) ?? throw new ArgumentException("View type must be a UserControl.");
+            view.DataContext = vm;
+            return view;
+        }
+
     }
 }

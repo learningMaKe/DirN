@@ -43,7 +43,7 @@
         BlurRadius="3"
         Opacity="0.1"
         ShadowDepth="1"
-        Color="{Binding Handler.HeaderEffectColor}" />
+        Color="{Binding Handler.Colorer.MainColor}" />
     </Viewbox.Effect>
 
     <Border
@@ -54,7 +54,7 @@
       <nui:NodeExpander
         MinWidth="160"
         Margin="4"
-        Background="{Binding Handler.HeaderBrush}">
+        Background="{Binding Handler.Colorer.MainBrush}">
         <nui:NodeExpander.Header>
 
           <Grid>

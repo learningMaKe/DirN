@@ -15,6 +15,16 @@ namespace DirN.Utils.WithColors
 
         public Brush MainBrush { get;private set; } = Brushes.Black;
 
+        public WithColor()
+        {
+            
+        }
+
+        public WithColor(Color mainColor)
+        {
+            this.MainColor = mainColor;
+        }
+
         private void OnMainColorChanged()
         {
             MainBrush = new SolidColorBrush(MainColor);

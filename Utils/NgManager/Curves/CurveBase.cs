@@ -2,6 +2,7 @@
 using DirN.Utils.Extension;
 using DirN.Utils.Nodes;
 using DirN.Utils.Nodes.Converters;
+using DirN.Utils.Nodes.Datas;
 using DirN.Utils.Tooltips;
 using DirN.ViewModels.Node;
 using Newtonsoft.Json;
@@ -21,7 +22,7 @@ namespace DirN.Utils.NgManager.Curves
     [JsonConverter(typeof(CurveConverter))]
     public abstract class CurveBase : BindableBase, ICurve
     {
-        private object? data;
+        private DataContainer data = new(null);
 
         [OnChangedMethod(nameof(OnPointChanged))]
         public Point StartPoint { get; set; }
@@ -50,20 +51,15 @@ namespace DirN.Utils.NgManager.Curves
 
         public bool CanExist => Starter is not null || Ender is not null;
 
-        public object? Data
+        public DataContainer Data
         {
             get
             {
-                if(HandlerManager.ConvertData(Starter!.PointerParent.PointerType, Ender!.PointerParent.PointerType, data,out object? result))
-                {
-                    return result;
-                }
-                Debug.WriteLine($"数据转换失败 StartPointOwner:{Starter.PointerParent.PointerType} EndPointOwner:{Ender.PointerParent.PointerType}");
-                return null ;
+                // ToDo : 此处应当考虑类型转换
+                return data;
             }
             set
             {
-                data = value;
                 SetProperty(ref data, value);
             }
         }

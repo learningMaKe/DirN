@@ -1,6 +1,7 @@
 ﻿using DirN.Utils.Base;
 using DirN.Utils.NgManager;
 using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using DirN.ViewModels.PointerControl;
 using PropertyChanged;
 using System;
@@ -22,7 +23,7 @@ namespace DirN.ViewModels.Node
 
         public bool IsInput => this.GetType() == typeof(InputerViewModel);
 
-        public object? Data
+        public DataContainer Data
         {
             get => GetData();
             set => SetData(value);
@@ -54,14 +55,14 @@ namespace DirN.ViewModels.Node
 
         public abstract void CutLink();
 
-        protected virtual object? GetData() { return null; }
-        protected virtual void SetData(object? data) { }
+        protected abstract DataContainer GetData();
+        protected abstract void SetData(DataContainer data);
+
         /// <summary>
         /// 获取指针数据
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException">校验失败</exception>
-        
         private void OnPointerConfigChanged()
         {
             if (PointerConfig is null) return;

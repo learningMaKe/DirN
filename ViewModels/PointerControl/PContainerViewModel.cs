@@ -1,4 +1,5 @@
 ﻿using DirN.Utils.Nodes;
+using DirN.Utils.Nodes.Datas;
 using PropertyChanged;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace DirN.ViewModels.PointerControl
 {
     public class PContainerViewModel:BindableBase,IPContainer
     {
-        public object? Data
+        public DataContainer Data
         {
             get => GetData();
             set => SetData(value);
@@ -45,12 +46,13 @@ namespace DirN.ViewModels.PointerControl
             }
         }
 
-        public object? GetData()
+        public DataContainer GetData()
         {
-            return PointerControlViewModel?.Data;
+            if(PointerControlViewModel is null) throw new NullReferenceException("PointerControlViewModel is null");
+            return PointerControlViewModel.Data;
         }
 
-        public void SetData(object? data)
+        public void SetData(DataContainer data)
         {
             if(PointerControlViewModel is null)
             {
